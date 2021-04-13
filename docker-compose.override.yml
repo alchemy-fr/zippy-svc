@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  zippy-api-php:
+    volumes:
+      - ./api:/srv/app
+
+  zippy-api-nginx:
+    volumes:
+      - ./api/public:/srv/app/public
+
+  zippy-worker:
+    volumes:
+      - ./api:/srv/app

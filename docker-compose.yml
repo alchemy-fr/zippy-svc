@@ -1,0 +1,70 @@
+version: '3.7'
+
+networks:
+  zippy:
+
+services:
+  zippy-api-php:
+    image: ${DOCKER_REGISTRY}/zippy-api-php:$DOCKER_TAG
+    build:
+      context: ./api
+      target: zippy-api-php
+    networks:
+      zippy:
+        aliases:
+          - zippy-php
+    environment:
+      - APP_ENV
+      - DATABASE_URL
+      - RABBITMQ_USER
+      - RABBITMQ_PASSWORD
+    volumes:
+      - zippy_vol:/srv/app/data
+    depends_on:
+      - rabbitmq
+
+  zippy-api-nginx:
+    image: ${DOCKER_REGISTRY}/zippy-api-nginx:$DOCKER_TAG
+    build:
+      context: ./api
+      target: zippy-api-nginx
+    networks:
+      zippy:
+        aliases:
+          - zippy-api
+    ports:
+      - ${ZIPPY_API_PORT}:80
+    depends_on:
+      - zippy-api-php
+
+  zippy-worker:
+    image: ${DOCKER_REGISTRY}/zippy-worker:$DOCKER_TAG
+    build:
+      context: ./api
+      target: zippy-worker
+    networks:
+      - zippy
+    depends_on:
+      - rabbitmq
+    environment:
+      - APP_ENV
+      - DATABASE_URL
+      - RABBITMQ_USER
+      - RABBITMQ_PASSWORD
+    volumes:
+      - zippy_vol:/srv/app/data
+
+  rabbitmq:
+    image: rabbitmq:3.7.14-management
+    hostname: rabbitmq
+    networks:
+      - zippy
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_vol:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_vol:
+  zippy_vol:
