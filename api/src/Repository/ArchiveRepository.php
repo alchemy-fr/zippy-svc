@@ -6,6 +6,6 @@ namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-class PackageRepository extends EntityRepository
+class ArchiveRepository extends EntityRepository
 {
 }
