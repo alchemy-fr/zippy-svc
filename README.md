@@ -6,10 +6,10 @@ A zip service to create archives from remote files.
 
 ## TODO
 
-[ ] Add security (JWT with shared public key)
-[ ] Move archives to another storage (S3, FTP, any flysystem adapter)
-[ ] Add more download adapters (FTP, S3, ...)
-[ ] Support compression options
+- [ ] Add security (JWT with shared public key)
+- [ ] Move archives to another storage (S3, FTP, any flysystem adapter)
+- [ ] Add more download adapters (FTP, S3, ...)
+- [ ] Support compression options
 
 ## Security
 
