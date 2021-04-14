@@ -37,7 +37,7 @@ final class File
      * @Groups({"file:read", "file:write", "archive:write"})
      * @ORM\Column(type="string", length=1024)
      */
-    private ?string $url = null;
+    private ?string $uri = null;
 
     /**
      * The path in the archive.
@@ -57,14 +57,14 @@ final class File
         return $this->id->__toString();
     }
 
-    public function getUrl(): ?string
+    public function getUri(): ?string
     {
-        return $this->url;
+        return $this->uri;
     }
 
-    public function setUrl(?string $url): void
+    public function setUri(?string $uri): void
     {
-        $this->url = $url;
+        $this->uri = $uri;
     }
 
     public function getPath(): ?string

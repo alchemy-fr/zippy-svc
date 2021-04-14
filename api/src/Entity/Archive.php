@@ -113,6 +113,11 @@ final class Archive
         $this->identifier = $identifier;
     }
 
+    public function isReady(): bool
+    {
+        return self::STATUS_READY === $this->getStatus();
+    }
+
     public function getStatus(): int
     {
         return $this->status;

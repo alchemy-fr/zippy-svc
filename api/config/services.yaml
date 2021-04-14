@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    app.data_dir: '%env(resolve:DATA_DIR)%'
+    app.archive_dir: '%app.data_dir%/archives'
 
 services:
     # default configuration for services in *this* file
@@ -21,6 +23,14 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
+    _instanceof:
+        Doctrine\Common\EventSubscriber:
+            tags: ['doctrine.event_subscriber']
+        Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessageHandlerInterface:
+            tags: ['arthem_rabbit.event_handler']
+        Symfony\Component\EventDispatcher\EventSubscriberInterface:
+            tags: ['kernel.event_subscriber']
+
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
     App\Controller\:
@@ -29,3 +39,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Archive\ArchiveManager:
+        arguments:
+            $dataDir: '%app.archive_dir%'

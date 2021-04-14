@@ -7,9 +7,17 @@ namespace App\Api\DataTransformer;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use App\Api\ArchiveOutput;
 use App\Entity\Archive;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ArchiveOutputDataTransformer implements DataTransformerInterface
 {
+    private UrlGeneratorInterface $urlGenerator;
+
+    public function __construct(UrlGeneratorInterface $urlGenerator)
+    {
+        $this->urlGenerator = $urlGenerator;
+    }
+
     /**
      * @param Archive $object
      */
@@ -21,6 +29,10 @@ class ArchiveOutputDataTransformer implements DataTransformerInterface
         $output->setId($object->getId());
         $output->setIdentifier($object->getIdentifier());
         $output->setStatus($object->getStatusLabel());
+
+        $output->setDownloadUrl($this->urlGenerator->generate('download_archive', [
+            'id' => $object->getId(),
+        ], UrlGeneratorInterface::ABSOLUTE_URL));
 
         return $output;
     }

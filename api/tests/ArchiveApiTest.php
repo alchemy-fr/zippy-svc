@@ -9,17 +9,27 @@ use App\Entity\File;
 
 class ArchiveApiTest extends ApiTestCase
 {
+    private function getTestDataSetDir(): string
+    {
+        return sprintf('file://%s', __DIR__.DIRECTORY_SEPARATOR.'files');
+    }
+
+    private function getArchiveDir(): string
+    {
+        return self::$container->getParameter('app.archive_dir');
+    }
+
     public function testPostArchive(): void
     {
         $identifier = uniqid('test');
-        $filePrefix = sprintf('file:///%s', __DIR__);
+        $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
-                'url' => $filePrefix.'/three.jpg',
+                'uri' => $filePrefix.'/three.jpg',
                 'path' => 'one/two/three.jpg',
             ],
             [
-                'url' => $filePrefix.'/four.txt',
+                'uri' => $filePrefix.'/four.txt',
                 'path' => 'four.txt',
             ],
         ];
@@ -34,12 +44,25 @@ class ArchiveApiTest extends ApiTestCase
         $this->assertEquals('application/json; charset=utf-8', $response->headers->get('Content-Type'));
 
         $this->assertArrayHasKey('id', $json);
-        $this->assertRegExp('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $json['id']);
+        $id = $json['id'];
+        $this->assertRegExp('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
         $this->assertEquals($identifier, $json['identifier']);
         $this->assertEquals('created', $json['status']);
+        $this->assertArrayHasKey('downloadUrl', $json);
+        $this->assertEquals(sprintf('http://localhost/archives/%s/download', $id), $json['downloadUrl']);
 
-        $archive = $this->getArchiveFromDatabase($json['id']);
+        $archive = $this->getArchiveFromDatabase($id);
         $this->expectedFiles($files, $archive);
+
+        $archivePath = $this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip';
+        $this->assertTrue(file_exists($archivePath));
+
+        $this->removeArchive($id);
+    }
+
+    private function removeArchive(string $id): void
+    {
+        unlink($this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip');
     }
 
     private function getArchiveFromDatabase(string $id): ?Archive
@@ -53,7 +76,7 @@ class ArchiveApiTest extends ApiTestCase
     {
         $this->assertEquals($files, array_map(function (File $f): array {
             return [
-                'url' => $f->getUrl(),
+                'uri' => $f->getUri(),
                 'path' => $f->getPath(),
             ];
         }, $archive->getFiles()->getValues()));
@@ -65,7 +88,7 @@ class ArchiveApiTest extends ApiTestCase
 
         $response = $this->request('PUT', '/archives/'.$archive->getId(), [
             'files' => [
-                'url' => 'https://some-url.com/some/path',
+                'uri' => 'https://some-url.com/some/path',
                 'path' => 'one/five.jpg',
             ],
         ]);
@@ -90,10 +113,10 @@ class ArchiveApiTest extends ApiTestCase
     {
         $archive = $this->createArchive();
 
-        $filePrefix = sprintf('file:///%s', __DIR__);
+        $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
-                'url' => $filePrefix.'/one/five.jpg',
+                'uri' => $filePrefix.'/one/five.jpg',
                 'path' => 'one/five.jpg',
             ],
         ];
@@ -115,7 +138,14 @@ class ArchiveApiTest extends ApiTestCase
         $archive = $this->createArchive();
 
         $response = $this->request('DELETE', '/archives/'.$archive->getId());
+
+        $this->clearEmBeforeApiCall();
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertNull($this->getArchiveFromDatabase($archive->getId()));
+    }
+
+    protected function clearEmBeforeApiCall(): void
+    {
+        self::getEntityManager()->clear();
     }
 }

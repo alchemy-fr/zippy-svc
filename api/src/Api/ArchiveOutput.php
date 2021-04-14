@@ -33,6 +33,11 @@ class ArchiveOutput
      */
     private string $status;
 
+    /**
+     * @Groups({"archive:read"})
+     */
+    private ?string $downloadUrl = null;
+
     public function getId(): string
     {
         return $this->id;
@@ -71,5 +76,15 @@ class ArchiveOutput
     public function setIdentifier(string $identifier): void
     {
         $this->identifier = $identifier;
+    }
+
+    public function getDownloadUrl(): ?string
+    {
+        return $this->downloadUrl;
+    }
+
+    public function setDownloadUrl(?string $downloadUrl): void
+    {
+        $this->downloadUrl = $downloadUrl;
     }
 }

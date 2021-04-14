@@ -9,12 +9,16 @@
         "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-json": "*",
+        "alchemy/zippy": "^1.0",
         "api-platform/core": "v2.6.3",
+        "arthem/rabbit-bundle": "^0.2.2",
         "composer/package-versions-deprecated": "1.11.99.1",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/doctrine-migrations-bundle": "^3.1",
         "doctrine/orm": "^2.8",
+        "guzzlehttp/guzzle": "^7.3",
         "nelmio/cors-bundle": "^2.1",
         "phpdocumentor/reflection-docblock": "^5.2",
         "ramsey/uuid-doctrine": "^1.6",
@@ -72,7 +76,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "rm -f var/cache/test/data.db && bin/console doctrine:schema:create -e test && ./bin/phpunit"
+        "test": "rm -f tests/data/test.db && bin/console doctrine:schema:create -e test && ./bin/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"
