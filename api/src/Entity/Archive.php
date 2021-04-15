@@ -32,7 +32,7 @@ use App\Api\ArchiveOutput;
  * )
  * @ORM\Entity(repositoryClass="App\Repository\ArchiveRepository")
  */
-final class Archive
+class Archive
 {
     public const STATUS_CREATED = 0;
     public const STATUS_IN_PROGRESS = 1;

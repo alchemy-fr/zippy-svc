@@ -1,3 +1,4 @@
 arthem_rabbit:
+  direct: false
   deffered: false
   failure: ~

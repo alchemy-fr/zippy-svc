@@ -1,4 +1,4 @@
-FROM php:7.4.4-fpm-alpine3.11 AS zippy-api-php
+FROM php:7.4.16-fpm-alpine3.13 AS zippy-api-php
 
 RUN apk add --no-cache --virtual .persistent-deps \
 		git \
@@ -59,14 +59,12 @@ ENTRYPOINT ["/srv/app/docker/fpm-entrypoint.sh"]
 
 CMD ["php-fpm"]
 
-FROM nginx:1.15.11-alpine AS zippy-api-nginx
+FROM nginx:1.19.10-alpine AS zippy-api-nginx
 
 RUN apk add curl
 
 COPY docker/nginx/conf.d /etc/nginx/conf.d/
 COPY --from=zippy-api-php /srv/app/public /srv/app/public
-
-HEALTHCHECK --interval=1m CMD curl -f http://localhost || nginx reload
 
 EXPOSE 80
 

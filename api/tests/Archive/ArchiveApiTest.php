@@ -4,21 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
-use App\Entity\Archive;
-use App\Entity\File;
-
-class ArchiveApiTest extends ApiTestCase
+class ArchiveApiTest extends AbstractZippyTestCase
 {
-    private function getTestDataSetDir(): string
-    {
-        return sprintf('file://%s', __DIR__.DIRECTORY_SEPARATOR.'files');
-    }
-
-    private function getArchiveDir(): string
-    {
-        return self::$container->getParameter('app.archive_dir');
-    }
-
     public function testPostArchive(): void
     {
         $identifier = uniqid('test');
@@ -60,28 +47,6 @@ class ArchiveApiTest extends ApiTestCase
         $this->removeArchive($id);
     }
 
-    private function removeArchive(string $id): void
-    {
-        unlink($this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip');
-    }
-
-    private function getArchiveFromDatabase(string $id): ?Archive
-    {
-        $em = self::getEntityManager();
-
-        return $em->find(Archive::class, $id);
-    }
-
-    private function expectedFiles(array $files, Archive $archive): void
-    {
-        $this->assertEquals($files, array_map(function (File $f): array {
-            return [
-                'uri' => $f->getUri(),
-                'path' => $f->getPath(),
-            ];
-        }, $archive->getFiles()->getValues()));
-    }
-
     public function testPutArchiveReturnsMethodNotAllowed(): void
     {
         $archive = $this->createArchive();
@@ -94,19 +59,6 @@ class ArchiveApiTest extends ApiTestCase
         ]);
 
         $this->assertEquals(405, $response->getStatusCode());
-    }
-
-    private function createArchive(array $options = []): Archive
-    {
-        $em = self::getEntityManager();
-
-        $archive = new Archive();
-        $archive->setIdentifier(uniqid('test'));
-
-        $em->persist($archive);
-        $em->flush();
-
-        return $archive;
     }
 
     public function testPatchArchive(): void
@@ -142,10 +94,5 @@ class ArchiveApiTest extends ApiTestCase
         $this->clearEmBeforeApiCall();
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertNull($this->getArchiveFromDatabase($archive->getId()));
-    }
-
-    protected function clearEmBeforeApiCall(): void
-    {
-        self::getEntityManager()->clear();
     }
 }

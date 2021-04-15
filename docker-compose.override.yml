@@ -1,14 +1,22 @@
 version: '3.7'
 
 services:
-  zippy-api-php:
+  php:
     volumes:
       - ./api:/srv/app
+    environment:
+      - APP_ENV=dev
+      - DATA_DIR=%kernel.project_dir%/data
+      - DATABASE_URL=sqlite:///%kernel.project_dir%/data/zippy.db
 
-  zippy-api-nginx:
+  nginx:
     volumes:
       - ./api/public:/srv/app/public
 
-  zippy-worker:
+  worker:
     volumes:
       - ./api:/srv/app
+    environment:
+      - APP_ENV=dev
+      - DATA_DIR=%kernel.project_dir%/data
+      - DATABASE_URL=sqlite:///%kernel.project_dir%/data/zippy.db

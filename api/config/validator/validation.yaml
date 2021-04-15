@@ -1,0 +1,24 @@
+App\Api\ArchiveInput:
+  properties:
+    identifier:
+      - NotNull:
+          groups: [Post]
+      - NotBlank:
+          groups: [Post]
+    files:
+      - NotNull: ~
+      - Count:
+          min: 1
+      - Valid: ~
+
+App\Entity\Archive:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: identifier
+
+App\Entity\File:
+  properties:
+    uri:
+      - NotNull: ~
+      - NotBlank: ~
+    path:
+      - NotNull: ~

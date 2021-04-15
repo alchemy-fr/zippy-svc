@@ -14,10 +14,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ApiResource(
  *  shortName="file",
+ *  collectionOperations={},
+ *  itemOperations={},
  * )
  * @ORM\Entity
  */
-final class File
+class File
 {
     /**
      * @ApiProperty(identifier=true)

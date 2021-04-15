@@ -59,4 +59,9 @@ abstract class ApiTestCase extends WebTestCase
     {
         return self::$container->get(EntityManagerInterface::class);
     }
+
+    protected function clearEmBeforeApiCall(): void
+    {
+        self::getEntityManager()->clear();
+    }
 }
