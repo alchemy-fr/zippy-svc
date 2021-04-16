@@ -5,10 +5,10 @@ networks:
 
 services:
   fpm:
-    image: ${DOCKER_REGISTRY}/zippy-api-php:$DOCKER_TAG
+    image: ${DOCKER_REGISTRY}/zippy-api-fpm:$DOCKER_TAG
     build:
       context: ./api
-      target: zippy-api-php
+      target: zippy-api-fpm
     networks:
       zippy:
         aliases:

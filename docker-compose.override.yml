@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  php:
+  fpm:
     volumes:
       - ./api:/srv/app
     environment:

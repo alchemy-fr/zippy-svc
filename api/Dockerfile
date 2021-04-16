@@ -1,4 +1,4 @@
-FROM php:7.4.16-fpm-alpine3.13 AS zippy-api-php
+FROM php:7.4.16-fpm-alpine3.13 AS zippy-api-fpm
 
 RUN apk add --no-cache --virtual .persistent-deps \
 		git \
@@ -64,11 +64,11 @@ FROM nginx:1.19.10-alpine AS zippy-api-nginx
 RUN apk add curl
 
 COPY docker/nginx/conf.d /etc/nginx/conf.d/
-COPY --from=zippy-api-php /srv/app/public /srv/app/public
+COPY --from=zippy-api-fpm /srv/app/public /srv/app/public
 
 EXPOSE 80
 
-FROM zippy-api-php as zippy-worker
+FROM zippy-api-fpm as zippy-worker
 
 RUN apk add --no-cache \
         supervisor \
