@@ -17,7 +17,7 @@ A zip service to create archives from remote files.
 
 In order to authenticate client, you must send the following authorization header:
 ```
-Authorization: <client_name>:<client_secret>
+Authorization: <client-id>:<client-secret>
 ```
 
 ## Usage

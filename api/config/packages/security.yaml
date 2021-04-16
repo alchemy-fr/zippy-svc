@@ -4,7 +4,7 @@ security:
         users_in_memory:
             memory:
                 users:
-                    '%env(resolve:CLIENT_USERNAME)%': { password: '%env(resolve:CLIENT_SECRET)%', roles: [ROLE_API] }
+                    '%env(resolve:CLIENT_ID)%': { password: '%env(resolve:CLIENT_SECRET)%', roles: [ROLE_API] }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
