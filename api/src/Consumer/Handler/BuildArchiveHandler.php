@@ -11,6 +11,7 @@ use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
 use Arthem\Bundle\RabbitBundle\Consumer\Exception\ObjectNotFoundForHandlerException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManager;
+use Throwable;
 
 class BuildArchiveHandler extends AbstractEntityManagerHandler
 {
@@ -37,7 +38,7 @@ class BuildArchiveHandler extends AbstractEntityManagerHandler
                 throw new ObjectNotFoundForHandlerException(Archive::class, $id, __CLASS__);
             }
 
-            if ($archive->getStatus() === Archive::STATUS_IN_PROGRESS) {
+            if (Archive::STATUS_IN_PROGRESS === $archive->getStatus()) {
                 return null;
             }
 
@@ -52,7 +53,15 @@ class BuildArchiveHandler extends AbstractEntityManagerHandler
             return;
         }
 
-        $this->archiveManager->buildArchive($archive);
+        try {
+            $this->archiveManager->buildArchive($archive);
+        } catch (Throwable $e) {
+            $archive->setStatus(Archive::STATUS_ERROR);
+            $em->persist($archive);
+            $em->flush();
+
+            throw $e;
+        }
 
         $archive->setStatus(Archive::STATUS_READY);
         $em->persist($archive);

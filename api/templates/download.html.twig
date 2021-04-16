@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Download your archive - Zippy{% endblock %}
+
+{% block content %}
+    <h1>Downloading...</h1>
+    <p>
+        Your download will begin shortly...
+    </p>
+    <p>
+        If it does not, please
+        <a href="{{ download_url }}">click here</a>!
+    </p>
+    <p>After your download has started, you can safely close this window.</p>
+    <script type="application/javascript">
+        document.location = '{{ download_url }}';
+    </script>
+{% endblock %}

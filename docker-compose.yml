@@ -18,6 +18,7 @@ services:
       - DATABASE_URL
       - RABBITMQ_USER
       - RABBITMQ_PASSWORD
+      - TRUSTED_PROXIES
     volumes:
       - zippy_vol:/data
     depends_on:
@@ -51,6 +52,7 @@ services:
       - DATABASE_URL
       - RABBITMQ_USER
       - RABBITMQ_PASSWORD
+      - VERIFY_SSL
     volumes:
       - zippy_vol:/data
 

@@ -60,7 +60,6 @@ class ArchiveManager
         $this->em->flush();
     }
 
-
     public function getArchive(string $id): ?Archive
     {
         return $this->em->find(Archive::class, $id);

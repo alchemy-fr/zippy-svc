@@ -16,13 +16,13 @@ class LocalStorageAdapter implements DownloadAdapterInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function downloadFiles(iterable $files, string $dest): void
     {
         foreach ($files as $file) {
             $from = substr($file->getUri(), strlen(self::PREFIX));
-            $to  = $dest.DIRECTORY_SEPARATOR.$file->getPath();
+            $to = $dest.DIRECTORY_SEPARATOR.$file->getPath();
             copy($from, $to);
         }
     }

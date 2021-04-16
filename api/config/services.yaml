@@ -30,6 +30,8 @@ services:
             tags: ['arthem_rabbit.event_handler']
         Symfony\Component\EventDispatcher\EventSubscriberInterface:
             tags: ['kernel.event_subscriber']
+        App\Download\DownloadAdapterInterface:
+            tags: ['app.download_adapter']
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -43,3 +45,12 @@ services:
     App\Archive\ArchiveManager:
         arguments:
             $dataDir: '%app.archive_dir%'
+
+    GuzzleHttp\Client:
+        arguments:
+            - verify: '%env(bool:VERIFY_SSL)%'
+              options:
+                  timeout: 30
+                  read_timeout: 10800
+
+    GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'

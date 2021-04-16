@@ -7,15 +7,15 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Api\ArchiveInput;
+use App\Api\ArchiveOutput;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use DateTime;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use App\Api\ArchiveInput;
-use App\Api\ArchiveOutput;
 
 /**
  * @ApiResource(
@@ -39,11 +39,14 @@ class Archive
     public const STATUS_IN_PROGRESS = 1;
     public const STATUS_READY = 2;
     public const STATUS_UPDATING = 3;
+    public const STATUS_ERROR = 4;
+
     private const STATUSES_LABELS = [
         self::STATUS_CREATED => 'created',
         self::STATUS_IN_PROGRESS => 'in_progress',
         self::STATUS_READY => 'ready',
         self::STATUS_UPDATING => 'updating',
+        self::STATUS_ERROR => 'error',
     ];
 
     /**
@@ -91,7 +94,7 @@ class Archive
     public function __construct()
     {
         $this->id = Uuid::uuid4();
-        $this->files  = new ArrayCollection();
+        $this->files = new ArrayCollection();
     }
 
     public function getId(): string
@@ -122,6 +125,11 @@ class Archive
     public function isReady(): bool
     {
         return self::STATUS_READY === $this->getStatus();
+    }
+
+    public function hasError(): bool
+    {
+        return self::STATUS_ERROR === $this->getStatus();
     }
 
     public function getStatus(): int

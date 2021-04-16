@@ -2,8 +2,7 @@ version: 2
 jobs:
   build:
     environment:
-      COMPOSE_PROJECT_NAME: circlecitest
-      APP_ENV: prod
+      COMPOSE_PROJECT_NAME: test
     docker:
       - image: buildpack-deps:trusty
     steps:

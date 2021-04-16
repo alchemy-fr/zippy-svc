@@ -33,7 +33,7 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             'groups' => [
                 'Default',
                 $isNew ? 'Post' : 'Patch',
-            ]
+            ],
         ]);
 
         $object = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new Archive();

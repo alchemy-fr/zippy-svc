@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace App\Api\DataPersister;
+
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use App\Consumer\Handler\BuildArchiveHandler;
 use App\Consumer\Handler\DeleteArchiveHandler;

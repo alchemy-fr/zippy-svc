@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Download;
 
-use App\Download\Adapter\HTTPDownloadAdapter;
-use App\Download\Adapter\LocalStorageAdapter;
 use App\Entity\File;
 
 class DownloadManager
@@ -15,11 +13,9 @@ class DownloadManager
      */
     private array $adapters = [];
 
-    public function __construct()
+    public function addAdapter(DownloadAdapterInterface $adapter): void
     {
-        // TODO make CompilerPass
-        $this->adapters[] = new HTTPDownloadAdapter();
-        $this->adapters[] = new LocalStorageAdapter();
+        $this->adapters[] = $adapter;
     }
 
     /**

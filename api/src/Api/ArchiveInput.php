@@ -12,7 +12,7 @@ final class ArchiveInput
 {
     /**
      * The external unique identifier.
-     * It should include consumer service name to avoid conflicts
+     * It should include consumer service name to avoid conflicts.
      *
      * @Groups({"archive:write"})
      */
