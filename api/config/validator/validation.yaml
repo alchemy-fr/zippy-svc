@@ -1,9 +1,8 @@
 App\Api\ArchiveInput:
   properties:
     identifier:
-      - NotNull:
-          groups: [Post]
       - NotBlank:
+          allowNull: true
           groups: [Post]
     files:
       - NotNull: ~

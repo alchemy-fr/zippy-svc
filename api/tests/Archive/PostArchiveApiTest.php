@@ -10,7 +10,6 @@ class PostArchiveApiTest extends AbstractZippyTestCase
 {
     public function testPostArchiveOK(): void
     {
-        $identifier = uniqid('test');
         $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
@@ -22,10 +21,34 @@ class PostArchiveApiTest extends AbstractZippyTestCase
                 'path' => 'four.txt',
             ],
         ];
-        $response = $this->request('POST', '/archives', [
-            'identifier' => $identifier,
+        $this->doTestPostArchiveOK($files, null);
+    }
+
+    public function testPostArchiveWithDefinedIdentifierOK(): void
+    {
+        $filePrefix = $this->getTestDataSetDir();
+        $files = [
+            [
+                'uri' => $filePrefix.'/three.jpg',
+                'path' => 'one/two/three.jpg',
+            ],
+            [
+                'uri' => $filePrefix.'/four.txt',
+                'path' => 'four.txt',
+            ],
+        ];
+        $this->doTestPostArchiveOK($files, uniqid('test'));
+    }
+
+    private function doTestPostArchiveOK(array $files, ?string $identifier): void
+    {
+        $data = [
             'files' => $files,
-        ]);
+        ];
+        if (null !== $identifier) {
+            $data['identifier'] = $identifier;
+        }
+        $response = $this->request('POST', '/archives', $data);
 
         $json = json_decode($response->getContent(), true);
 
@@ -35,7 +58,9 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $this->assertArrayHasKey('id', $json);
         $id = $json['id'];
         $this->assertRegExp('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
-        $this->assertEquals($identifier, $json['identifier']);
+        if (null !== $identifier) {
+            $this->assertEquals($identifier, $json['identifier']);
+        }
         $this->assertEquals('created', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
         $this->assertEquals(sprintf('http://localhost/archives/%s/download', $id), $json['downloadUrl']);
@@ -49,7 +74,7 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $this->removeArchive($id);
     }
 
-    public function testPostArchive422(): void
+    public function testPostArchiveWithEmptyIdentifierReturns422(): void
     {
         $filePrefix = $this->getTestDataSetDir();
         $files = [
@@ -63,7 +88,18 @@ class PostArchiveApiTest extends AbstractZippyTestCase
             ],
         ];
         $response = $this->request('POST', '/archives', [
+            'identifier' => '',
             'files' => $files,
+        ]);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('application/problem+json; charset=utf-8', $response->headers->get('Content-Type'));
+    }
+
+    public function testPostArchiveWithEmptyFilesReturns422(): void
+    {
+        $response = $this->request('POST', '/archives', [
+            'files' => [],
         ]);
 
         $this->assertEquals(422, $response->getStatusCode());

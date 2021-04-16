@@ -45,3 +45,5 @@ curl --location --request POST 'http://localhost:3088/archives' \
     ]
 }'
 ```
+
+> Note that `identifier` is optional. If not provided, a generated one will be returned based on the files.

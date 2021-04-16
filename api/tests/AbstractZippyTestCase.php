@@ -21,6 +21,13 @@ abstract class AbstractZippyTestCase extends ApiTestCase
 
     protected function removeArchive(string $id): void
     {
+        $em = self::getEntityManager();
+        $archive = $em->find(Archive::class, $id);
+        if ($archive instanceof Archive) {
+            $em->remove($archive);
+            $em->flush();;
+        }
+
         unlink($this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip');
     }
 

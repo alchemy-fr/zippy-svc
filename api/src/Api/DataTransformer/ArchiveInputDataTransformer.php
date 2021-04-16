@@ -8,15 +8,18 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Validator\ValidatorInterface;
 use App\Api\ArchiveInput;
+use App\Archive\IdentifierGenerator;
 use App\Entity\Archive;
 
 class ArchiveInputDataTransformer implements DataTransformerInterface
 {
     private ValidatorInterface $validator;
+    private IdentifierGenerator $identifierGenerator;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator, IdentifierGenerator $identifierGenerator)
     {
         $this->validator = $validator;
+        $this->identifierGenerator = $identifierGenerator;
     }
 
     /**
@@ -36,7 +39,8 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
         $object = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new Archive();
 
         if ($isNew) {
-            $object->setIdentifier($data->getIdentifier());
+            $identifier = $data->getIdentifier() ?? $this->identifierGenerator->generateIdentifier($data->getFiles());
+            $object->setIdentifier($identifier);
 
             foreach ($data->getFiles() as $file) {
                 $object->addFile($file);
