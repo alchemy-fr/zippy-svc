@@ -46,6 +46,7 @@ abstract class AbstractZippyTestCase extends ApiTestCase
         $em = self::getEntityManager();
 
         $archive = new Archive();
+        $archive->setClient('client');
         $archive->setIdentifier(uniqid('test'));
 
         $em->persist($archive);

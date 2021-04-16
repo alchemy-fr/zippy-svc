@@ -10,16 +10,19 @@ use App\Entity\Archive;
 use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
 use Arthem\Bundle\RabbitBundle\Producer\EventProducer;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Security;
 
 final class ArchiveDataPersister implements ContextAwareDataPersisterInterface
 {
     private EntityManagerInterface $em;
     private EventProducer $eventProducer;
+    private Security $security;
 
-    public function __construct(EntityManagerInterface $em, EventProducer $eventProducer)
+    public function __construct(EntityManagerInterface $em, EventProducer $eventProducer, Security $security)
     {
         $this->em = $em;
         $this->eventProducer = $eventProducer;
+        $this->security = $security;
     }
 
     public function supports($data, array $context = []): bool
@@ -32,6 +35,8 @@ final class ArchiveDataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
+        $data->setClient($this->security->getUser()->getUsername());
+
         $this->em->persist($data);
         $this->em->flush();
 

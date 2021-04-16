@@ -6,7 +6,8 @@ A zip service to create archives from remote files.
 
 ## TODO
 
-- [ ] Add security (JWT with shared public key)
+- [X] Add security
+- [ ] Support multiple clients
 - [ ] Move archives to another storage (S3, FTP, any flysystem adapter)
 - [ ] Add more download adapters (FTP, S3, ...)
 - [ ] Support compression options
@@ -25,6 +26,7 @@ Test your first archive:
 ```bash
 curl --location --request POST 'http://localhost:3088/archives' \
 --header 'Content-Type: application/json' \
+--header 'Authorization: client:secret' \
 --data-raw '{
     "identifier": "my_first_archive",
     "files": [

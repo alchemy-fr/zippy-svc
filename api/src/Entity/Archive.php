@@ -20,6 +20,7 @@ use App\Api\ArchiveOutput;
 /**
  * @ApiResource(
  *  shortName="archive",
+ *  attributes={"security"="is_granted('ROLE_API')"},
  *  normalizationContext={"groups"={"_", "archive:read"}},
  *  denormalizationContext={"groups"={"archive:write"}},
  *  input=ArchiveInput::class,
@@ -51,6 +52,11 @@ class Archive
      * @ORM\Column(type="uuid", unique=true)
      */
     private UuidInterface $id;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=false)
+     */
+    private ?string $client = null;
 
     /**
      * @ORM\Column(type="datetime")
@@ -147,5 +153,15 @@ class Archive
     public function removeFile(File $file): void
     {
         $this->files->removeElement($file);
+    }
+
+    public function getClient(): ?string
+    {
+        return $this->client;
+    }
+
+    public function setClient(?string $client): void
+    {
+        $this->client = $client;
     }
 }

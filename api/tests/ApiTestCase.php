@@ -23,6 +23,7 @@ abstract class ApiTestCase extends WebTestCase
     ): Response {
         $server['CONTENT_TYPE'] = $server['CONTENT_TYPE'] ?? 'application/json';
         $server['HTTP_ACCEPT'] = $server['HTTP_ACCEPT'] ?? 'application/json';
+        $server['HTTP_AUTHORIZATION'] = 'client:secret';
 
         if (empty($content) && !empty($params) && in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'], true)) {
             $content = json_encode($params);

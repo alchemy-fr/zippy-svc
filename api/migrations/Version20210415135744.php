@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210415111621 extends AbstractMigration
+final class Version20210415135744 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -23,7 +23,7 @@ final class Version20210415111621 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', 'Migration can only be executed safely on \'sqlite\'.');
 
         $this->addSql('CREATE TABLE archive (id CHAR(36) NOT NULL COLLATE BINARY --(DC2Type:uuid)
-        , created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, identifier VARCHAR(128) NOT NULL COLLATE BINARY, status SMALLINT NOT NULL, PRIMARY KEY(id))');
+        , client VARCHAR(128) NOT NULL COLLATE BINARY, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, identifier VARCHAR(128) NOT NULL COLLATE BINARY, status SMALLINT NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_D5FC5D9C772E836A ON archive (identifier)');
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'sqlite', 'Migration can only be executed safely on \'sqlite\'.');
 

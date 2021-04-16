@@ -43,6 +43,9 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             }
         } else {
             // TODO diff files
+            foreach ($data->getFiles() as $file) {
+                $object->addFile($file);
+            }
         }
 
         return $object;
