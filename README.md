@@ -8,13 +8,17 @@ A zip service to create archives from remote files.
 
 - [X] Add security
 - [ ] Support multiple clients
+- [ ] Support PATCH method (diff files in archive)
 - [ ] Move archives to another storage (S3, FTP, any flysystem adapter)
 - [ ] Add more download adapters (FTP, S3, ...)
 - [ ] Support compression options
 
 ## Security
 
-Security is not implement yet. You should consider using this service on a very private network, as an internal service.
+In order to authenticate client, you must send the following authorization header:
+```
+Authorization: <client_name>:<client_secret>
+```
 
 ## Usage
 
