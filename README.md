@@ -47,3 +47,12 @@ curl --location --request POST 'http://localhost:3088/archives' \
 ```
 
 > Note that `identifier` is optional. If not provided, a generated one will be returned based on the files.
+
+## Developers
+
+Configure docker-compose to use the dev file, then install PHP dependencies:
+
+```bash
+export COMPOSE_FILE=docker-compose.yaml:docker-compose.dev.yaml
+docker-compose run --rm fpm composer install
+```
