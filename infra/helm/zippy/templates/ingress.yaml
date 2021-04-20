@@ -16,7 +16,7 @@ spec:
                 name: nginx
                 port:
                   number: 80
-tls:
-  - hosts:
-      - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
-    secretName: {{ .Values.ingress.secretName }}
+  tls:
+    - hosts:
+        - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
+      secretName: {{ .Values.ingress.secretName }}
