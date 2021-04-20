@@ -19,6 +19,8 @@ services:
       - RABBITMQ_USER
       - RABBITMQ_PASSWORD
       - TRUSTED_PROXIES
+      - CLIENT_ID
+      - CLIENT_SECRET
     volumes:
       - zippy_vol:/data
     depends_on:

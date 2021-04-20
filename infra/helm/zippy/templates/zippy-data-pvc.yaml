@@ -1,0 +1,22 @@
+{{- with .Values.zippy.persistence }}
+{{- if .enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+  name: {{ include "zippy.fullname" $ }}-data
+spec:
+  accessModes:
+    - {{ .accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .size | quote }}
+{{- if .storageClass }}
+{{- if (eq "-" .storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: {{ .storageClass | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
