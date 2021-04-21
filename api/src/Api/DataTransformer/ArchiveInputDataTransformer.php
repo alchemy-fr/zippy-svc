@@ -10,6 +10,7 @@ use ApiPlatform\Core\Validator\ValidatorInterface;
 use App\Api\ArchiveInput;
 use App\Archive\IdentifierGenerator;
 use App\Entity\Archive;
+use DateTime;
 
 class ArchiveInputDataTransformer implements DataTransformerInterface
 {
@@ -50,6 +51,13 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             foreach ($data->getFiles() as $file) {
                 $object->addFile($file);
             }
+        }
+
+        if ($data->getExpiresIn()) {
+            $expiresAt = new DateTime();
+            $expiresAt->setTimestamp(time() + $data->getExpiresIn());
+
+            $object->setExpiresAt($expiresAt);
         }
 
         return $object;

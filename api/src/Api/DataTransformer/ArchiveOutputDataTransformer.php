@@ -29,6 +29,7 @@ class ArchiveOutputDataTransformer implements DataTransformerInterface
         $output->setId($object->getId());
         $output->setIdentifier($object->getIdentifier());
         $output->setStatus($object->getStatusLabel());
+        $output->setExpiresAt($object->getExpiresAt());
 
         $output->setDownloadUrl($this->urlGenerator->generate('download_archive', [
             'id' => $object->getId(),

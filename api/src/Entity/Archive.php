@@ -21,7 +21,10 @@ use Ramsey\Uuid\UuidInterface;
  * @ApiResource(
  *  shortName="archive",
  *  attributes={"security"="is_granted('ROLE_API')"},
- *  normalizationContext={"groups"={"_", "archive:read"}},
+ *  normalizationContext={
+ *     "groups"={"_", "archive:read"},
+ *    "skip_null_values" = false,
+ *  },
  *  denormalizationContext={"groups"={"archive:write"}},
  *  input=ArchiveInput::class,
  *  output=ArchiveOutput::class,
@@ -72,6 +75,11 @@ class Archive
      * @Gedmo\Timestampable(on="update")
      */
     private ?DateTime $updatedAt = null;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private ?DateTime $expiresAt = null;
 
     /**
      * @ORM\Column(type="string", length=128, nullable=false, unique=true)
@@ -171,5 +179,15 @@ class Archive
     public function setClient(?string $client): void
     {
         $this->client = $client;
+    }
+
+    public function getExpiresAt(): ?DateTime
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(?DateTime $expiresAt): void
+    {
+        $this->expiresAt = $expiresAt;
     }
 }

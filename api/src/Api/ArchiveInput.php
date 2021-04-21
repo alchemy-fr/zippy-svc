@@ -19,6 +19,13 @@ final class ArchiveInput
     private ?string $identifier = null;
 
     /**
+     * The archive TTL in seconds.
+     *
+     * @Groups({"archive:write"})
+     */
+    private ?int $expiresIn = null;
+
+    /**
      * @var File[]
      *
      * @ApiProperty(readableLink=true)
@@ -44,5 +51,15 @@ final class ArchiveInput
     public function setFiles(array $files): void
     {
         $this->files = $files;
+    }
+
+    public function getExpiresIn(): ?int
+    {
+        return $this->expiresIn;
+    }
+
+    public function setExpiresIn(?int $expiresIn): void
+    {
+        $this->expiresIn = $expiresIn;
     }
 }

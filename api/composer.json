@@ -77,7 +77,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "rm -f tests/data/test.db && bin/console doctrine:schema:create -e test && ./bin/phpunit"
+        "test": "unset DATA_DIR DATABASE_URL && rm -f tests/data/test.db && bin/console doctrine:schema:create -e test && ./bin/phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"

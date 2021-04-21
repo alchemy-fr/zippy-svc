@@ -6,6 +6,7 @@ namespace App\Api;
 
 use App\Api\Traits\CreatedAtDTOTrait;
 use App\Api\Traits\UpdatedAtDTOTrait;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 class ArchiveOutput
@@ -37,6 +38,11 @@ class ArchiveOutput
      * @Groups({"archive:read"})
      */
     private ?string $downloadUrl = null;
+
+    /**
+     * @Groups({"archive:read"})
+     */
+    private ?DateTime $expiresAt = null;
 
     public function getId(): string
     {
@@ -86,5 +92,15 @@ class ArchiveOutput
     public function setDownloadUrl(?string $downloadUrl): void
     {
         $this->downloadUrl = $downloadUrl;
+    }
+
+    public function getExpiresAt(): ?DateTime
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(?DateTime $expiresAt): void
+    {
+        $this->expiresAt = $expiresAt;
     }
 }
