@@ -34,6 +34,8 @@ class CleanOldArchivesCommand extends Command
     {
         $this->eventProducer->publish(new EventMessage(CleanOldArchivesHandler::EVENT, []));
 
+        $output->writeln('Clean triggered!');
+
         return 0;
     }
 }

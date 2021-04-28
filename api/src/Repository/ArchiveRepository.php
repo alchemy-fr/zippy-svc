@@ -13,8 +13,10 @@ class ArchiveRepository extends EntityRepository
     /**
      * @return Archive[]|iterable
      */
-    public function getAllIterator(DateTime $now = null): iterable
+    public function getExpired(DateTime $now = null): iterable
     {
+        $now ??= new DateTime();
+
         return $this->createQueryBuilder('a')
             ->select('a')
             ->andWhere('a.expiresAt IS NOT NULL AND a.expiresAt < :date')

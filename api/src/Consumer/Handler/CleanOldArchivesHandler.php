@@ -30,7 +30,7 @@ class CleanOldArchivesHandler extends AbstractEntityManagerHandler
         /** @var EntityManager $em */
         $em = $this->getEntityManager();
 
-        $archives = $em->getRepository(Archive::class)->getAllIterator();
+        $archives = $em->getRepository(Archive::class)->getExpired();
 
         foreach ($archives as $archive) {
             $this->eventProducer->publish(new EventMessage(DeleteArchiveHandler::EVENT, [

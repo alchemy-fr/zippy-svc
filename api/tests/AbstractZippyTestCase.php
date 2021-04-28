@@ -56,6 +56,10 @@ abstract class AbstractZippyTestCase extends ApiTestCase
         $archive->setClient('client');
         $archive->setIdentifier(uniqid('test'));
 
+        if (isset($options['expiresAt'])) {
+            $archive->setExpiresAt($options['expiresAt']);
+        }
+
         $em->persist($archive);
         $em->flush();
 
