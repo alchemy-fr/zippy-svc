@@ -1,2 +1,3 @@
 .idea
 /env.local
+/infra/helm/zippy/myvalues.yaml

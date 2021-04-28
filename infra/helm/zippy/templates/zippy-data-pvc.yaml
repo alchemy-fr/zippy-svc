@@ -4,7 +4,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   annotations:
-  name: {{ include "zippy.fullname" $ }}-data
+  name: {{ include "zippy.fullname" $ }}-data-pvc
 spec:
   accessModes:
     - {{ .accessMode | quote }}
