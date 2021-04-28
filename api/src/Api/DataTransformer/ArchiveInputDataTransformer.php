@@ -11,16 +11,23 @@ use App\Api\ArchiveInput;
 use App\Archive\IdentifierGenerator;
 use App\Entity\Archive;
 use DateTime;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ArchiveInputDataTransformer implements DataTransformerInterface
 {
     private ValidatorInterface $validator;
     private IdentifierGenerator $identifierGenerator;
+    private ?int $maxExpirationTime;
 
-    public function __construct(ValidatorInterface $validator, IdentifierGenerator $identifierGenerator)
+    public function __construct(
+        ValidatorInterface $validator,
+        IdentifierGenerator $identifierGenerator,
+        ?int $maxExpirationTime
+    )
     {
         $this->validator = $validator;
         $this->identifierGenerator = $identifierGenerator;
+        $this->maxExpirationTime = $maxExpirationTime;
     }
 
     /**
@@ -53,9 +60,20 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             }
         }
 
+        $hasMaxExpiration = $this->maxExpirationTime >= 0;
+
         if ($data->getExpiresIn()) {
+            if ($hasMaxExpiration && $data->getExpiresIn() > $this->maxExpirationTime) {
+                throw new BadRequestHttpException(sprintf('Expiration must not exceed %d seconds', $this->maxExpirationTime));
+            }
+
             $expiresAt = new DateTime();
             $expiresAt->setTimestamp(time() + $data->getExpiresIn());
+
+            $object->setExpiresAt($expiresAt);
+        } elseif ($hasMaxExpiration) {
+            $expiresAt = new DateTime();
+            $expiresAt->setTimestamp(time() + $this->maxExpirationTime);
 
             $object->setExpiresAt($expiresAt);
         }

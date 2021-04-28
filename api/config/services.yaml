@@ -54,3 +54,7 @@ services:
                   read_timeout: 10800
 
     GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'
+
+    App\Api\DataTransformer\ArchiveInputDataTransformer:
+        arguments:
+            $maxExpirationTime: '%env(int:MAX_EXPIRATION_TIME)%'

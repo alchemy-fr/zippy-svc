@@ -46,6 +46,13 @@ curl --location --request POST 'http://localhost:3088/archives' \
 }'
 ```
 
+### Parameters
+
+- **MAX_EXPIRATION_TIME**
+Set the maximum retention allowed for an archive. 
+Default: `-1` no maximum
+
+
 > Note that `identifier` is optional. If not provided, a generated one will be returned based on the files.
 
 ## Developers
