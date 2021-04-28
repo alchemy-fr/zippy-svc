@@ -75,6 +75,12 @@ RUN apk add --no-cache \
     && mkdir -p /var/log/supervisor \
     && chown -R app: /var/log/supervisor
 
+# Cron part
+RUN touch /var/log/cron.log \
+    && chmod 755 /srv/app/docker/cron/start-cron.sh \
+    && chmod +x /srv/app/docker/cron/cron-script.sh \
+    && /usr/bin/crontab /srv/app/docker/cron/app-crontab
+
 COPY docker/supervisor/* /etc/supervisor.d/
 
 ENTRYPOINT []

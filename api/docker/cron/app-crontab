@@ -1,0 +1,1 @@
+*/15 * * * * /srv/app/docker/cron/cron-script.sh >> /var/log/cron.log 2>&1
