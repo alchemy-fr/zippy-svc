@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  zippy:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2021-04-29T20:41:24.968164492Z"
+    description: Zippy service Helm chart for Kubernetes
+    digest: 6d1a42b912972bad21585b95076b6912e3d2221bc31eeea25ff35d1735d8d8b1
+    name: zippy
+    type: application
+    urls:
+    - https://alchemy-fr.github.io/zippy-svc/zippy-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-04-29T20:41:24.967268414Z"
