@@ -20,12 +20,12 @@ spec:
     spec:
       volumes:
       - name: rabbitmq
-      {{- if .persistence.enabled }}
-      persistentVolumeClaim:
-        claimName: {{ include "zippy.fullname" $ }}-rabbitmq-pvc
-      {{- else }}
-      emptyDir: {}
-      {{- end }}
+        {{- if .persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "zippy.fullname" $ }}-rabbitmq-pvc
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
       hostAliases:
         - ip: "127.0.0.1"
           hostnames:

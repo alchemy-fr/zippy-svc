@@ -20,7 +20,7 @@ data:
 {{- if .enabled }}
     VHOST="{{ index .vhost }}"
     rabbitmqctl -n rabbit@rabbitmq add_vhost ${VHOST}
-    rabbitmqctl -n rabbit@rabbitmq set_permissions -p ${VHOST} ${ } '.*' '.*' '.*'
+    rabbitmqctl -n rabbit@rabbitmq set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
 {{- end }}
 {{- end }}
 ---

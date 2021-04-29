@@ -1,5 +1,5 @@
-{{- with .Values.rabbitmq }}
-{{- if and .persistence.enabled (not .persistence.existingClaim) }}
+{{- with .Values.rabbitmq.persistence }}
+{{- if and .enabled (not .existingClaim) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
