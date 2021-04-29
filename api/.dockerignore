@@ -3,5 +3,13 @@ Dockerfile
 /var
 /data/*
 /vendor
-.php_cs.cache
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/bin/.phpunit
 .phpunit.result.cache
+/phpunit.xml
+/.php_cs
+/.php_cs.cache

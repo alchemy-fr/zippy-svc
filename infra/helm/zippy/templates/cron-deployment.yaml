@@ -1,0 +1,37 @@
+{{ with .Values.zippy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zippy.fullname" $ }}-cron
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zippy
+      tier: cron
+  template:
+    metadata:
+      labels:
+        app: zippy
+        tier: cron
+    spec:
+      volumes:
+        - name: data
+          {{- if .persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "zippy.fullname" $ }}-data-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      containers:
+      - name: zippy-cron
+        image: {{ $.Values.image.registry }}/zippy-worker:{{ $.Values.image.tag }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        args:
+          - /srv/app/docker/cron/start-cron.sh
+        envFrom:
+          - secretRef:
+              name: {{ include "zippy.fullname" $ }}-rabbitmq
+          - secretRef:
+              name: {{ include "zippy.fullname" $ }}-db-secret
+{{- end }}
