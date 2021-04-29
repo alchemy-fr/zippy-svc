@@ -1,0 +1,38 @@
+{{ with .Values.zippy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zippy.fullname" $ }}-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zippy
+      tier: worker
+  template:
+    metadata:
+      labels:
+        app: zippy
+        tier: worker
+    spec:
+      volumes:
+        - name: data
+          {{- if .persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "zippy.fullname" $ }}-data-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      containers:
+      - name: zippy-worker
+        image: {{ $.Values.image.registry }}/zippy-worker:{{ $.Values.image.tag }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+          - name: data
+            mountPath: "/data"
+        envFrom:
+          - secretRef:
+              name: {{ include "zippy.fullname" $ }}-rabbitmq
+          - secretRef:
+              name: {{ include "zippy.fullname" $ }}-db-secret
+{{- end }}

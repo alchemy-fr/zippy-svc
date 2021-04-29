@@ -9,6 +9,19 @@ rabbitmq:
   enabled: true
   username: zippy
   password: defineme
+  host: rabbitmq
+  port: 5672
+  vhost: /
+  externalSecretName:  
+  ssl: false
+  persistence:
+    enabled: true
+    existingClaim:
+    storageClass:
+    annotations: {}
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    subPath:
 
 zippy:
   # You should defined restricted IP.
