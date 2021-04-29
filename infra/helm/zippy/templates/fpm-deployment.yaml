@@ -41,3 +41,4 @@ spec:
           - secretRef:
               name: {{ include "zippy.fullname" $ }}-db-secret
 {{- end }}
+

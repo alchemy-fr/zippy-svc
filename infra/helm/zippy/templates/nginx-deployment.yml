@@ -18,3 +18,4 @@ spec:
       - name: zippy-nginx
         image: {{ $.Values.image.registry }}/zippy-api-nginx:{{ $.Values.image.tag }}
         terminationMessagePolicy: FallbackToLogsOnError
+

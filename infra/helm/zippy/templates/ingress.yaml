@@ -20,3 +20,4 @@ spec:
     - hosts:
         - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
       secretName: {{ .Values.ingress.secretName }}
+      
