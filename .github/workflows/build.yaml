@@ -14,7 +14,7 @@ jobs:
           docker-compose build
       - name: Test API
         run: |
-          docker-compose run --rm api composer test
+          docker-compose run --rm -e APP_ENV=dev api /bin/ash -c 'composer install && composer test'
 
       - name: Test HELM
         run: |
