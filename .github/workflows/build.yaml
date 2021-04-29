@@ -41,5 +41,5 @@ jobs:
         uses: stefanprodan/helm-gh-pages@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: infra/helm/zippy
+          charts_dir: infra/helm
           linting: off
