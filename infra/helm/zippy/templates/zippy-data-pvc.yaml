@@ -1,4 +1,4 @@
-{{- with .Values.rabbitmq.persistence }}
+{{- with .Values.zippy.persistence }}
 {{- if and .enabled (not .existingClaim) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
