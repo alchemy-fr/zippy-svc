@@ -20,7 +20,7 @@ rabbitmq:
     storageClass:
     annotations: {}
     accessMode: ReadWriteOnce
-    size: 5Gi
+    size: 1Gi
     subPath:
 
 zippy:
