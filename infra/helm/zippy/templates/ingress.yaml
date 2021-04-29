@@ -13,7 +13,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nginx
+                name: zippy-nginx
                 port:
                   number: 80
   tls:
