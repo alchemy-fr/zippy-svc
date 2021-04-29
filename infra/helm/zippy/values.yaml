@@ -26,7 +26,7 @@ rabbitmq:
 zippy:
   # You should defined restricted IP.
   # or (/!\ insecured) '127.0.0.1,REMOTE_ADDR' to allow all proxies
-  trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+  trustedProxies: '127.0.0.1,REMOTE_ADDR'
   database:
     # i.e. postgres://user@pass:port/db-name
     dsn:
@@ -39,6 +39,8 @@ zippy:
     subPath:
     size: 5Gi
 
+  maxExpirationTime: -1
+
   storage:
     serveOnS3: false
 
@@ -46,6 +48,8 @@ zippy:
     id: client
     secret: secret
 
+  worker:
+    replicas: 1
 
 ingress:
   secretName:

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "zippy.fullname" $ }}-php-config
+datda:
+  APP_ENV: prod
+  TRUSTED_PROXIES: {{ required "Missing zippy.trustedProxies" .Values.zippy.trustedProxies | quote }}
+  MAX_EXPIRATION_TIME: {{ .Values.zippy.maxExpirationTime | quote }}

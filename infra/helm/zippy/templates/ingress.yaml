@@ -13,11 +13,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: zippy-nginx
+                name: zippy-api
                 port:
                   number: 80
   tls:
     - hosts:
         - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
       secretName: {{ .Values.ingress.secretName }}
-      

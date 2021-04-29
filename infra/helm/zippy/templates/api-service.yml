@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "zippy.fullname" $ }}-svc
+  name: zippy-api
 spec:
   ports:
-  - name: zippy
+  - name: tcp
     port: 80
     targetPort: 80
   selector:
     app: zippy
-    tier: nginx
-    
+    tier: api

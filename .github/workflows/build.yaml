@@ -1,0 +1,42 @@
+name: Build images, test, and then push
+
+on: push
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: build
+        run: |
+          docker-compose build
+
+  test:
+    name: 'Test'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test API
+        run: |
+          docker-compose run --rm api composer test
+
+      - name: Test HELM
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          helm template infra/helm/zippy -f infra/helm/zippy/myvalues.yaml
+          helm lint infra/helm/zippy
+
+  publish:
+    name: Publish images and Helm package
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Helm charts
+        uses: stefanprodan/helm-gh-pages@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          charts_dir: infra/helm/zippy

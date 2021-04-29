@@ -13,7 +13,7 @@ spec:
       storage: {{ .size | quote }}
 {{- if .storageClass }}
 {{- if (eq "-" .storageClass) }}
-  storageClassName: "standard"
+  storageClassName: ""
 {{- else }}
   storageClassName: {{ .storageClass | quote }}
 {{- end }}

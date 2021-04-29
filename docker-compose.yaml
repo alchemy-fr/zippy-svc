@@ -4,15 +4,13 @@ networks:
   zippy:
 
 services:
-  fpm:
-    image: ${DOCKER_REGISTRY}/zippy-api-fpm:$DOCKER_TAG
+  api:
+    image: ${DOCKER_REGISTRY}/zippy-api:$DOCKER_TAG
     build:
       context: ./api
-      target: zippy-api-fpm
+      target: zippy-api
     networks:
-      zippy:
-        aliases:
-          - zippy-fpm
+      - zippy
     environment:
       - APP_ENV
       - DATABASE_URL
@@ -25,20 +23,8 @@ services:
       - zippy_vol:/data
     depends_on:
       - rabbitmq
-
-  nginx:
-    image: ${DOCKER_REGISTRY}/zippy-api-nginx:$DOCKER_TAG
-    build:
-      context: ./api
-      target: zippy-api-nginx
-    networks:
-      zippy:
-        aliases:
-          - zippy-api
     ports:
       - ${ZIPPY_API_PORT}:80
-    depends_on:
-      - fpm
 
   worker:
     image: ${DOCKER_REGISTRY}/zippy-worker:$DOCKER_TAG

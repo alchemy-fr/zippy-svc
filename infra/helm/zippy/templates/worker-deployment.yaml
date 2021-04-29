@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ include "zippy.fullname" $ }}-worker
 spec:
-  replicas: 1
+  replicas: {{ .worker.replicas }}
   selector:
     matchLabels:
       app: zippy
@@ -36,4 +36,3 @@ spec:
           - secretRef:
               name: {{ include "zippy.fullname" $ }}-db-secret
 {{- end }}
-

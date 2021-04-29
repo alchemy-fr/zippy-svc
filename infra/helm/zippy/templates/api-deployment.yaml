@@ -2,18 +2,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "zippy.fullname" $ }}-fpm
+  name: {{ include "zippy.fullname" $ }}-api
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: zippy
-      tier: fpm
+      tier: api
   template:
     metadata:
       labels:
         app: zippy
-        tier: fpm
+        tier: api
     spec:
       volumes:
         - name: data
@@ -24,15 +24,15 @@ spec:
           emptyDir: {}
           {{- end }}
       containers:
-      - name: zippy-fpm
-        image: {{ $.Values.image.registry }}/zippy-api-fpm:{{ $.Values.image.tag }}
+      - name: zippy-api
+        image: {{ $.Values.image.registry }}/zippy-api:{{ $.Values.image.tag }}
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
           - name: data
             mountPath: "/data"
         env:
           - name: TRUSTED_PROXIES
-            value: {{ required "Missing zippy.trusted_proxies" .trusted_proxies | default "127.0.0.1" | quote }}
+            value: {{ required "Missing zippy.trustedProxies" .trustedProxies | default "127.0.0.1" | quote }}
         envFrom:
           - secretRef:
               name: {{ include "zippy.fullname" $ }}-rabbitmq

@@ -2,7 +2,7 @@
 
 # [WIP] Zippy HTTP Service
 
-A zip service to create archives from remote files.
+A zip service to create archives from remote files and serve them.
 
 ## TODO
 
@@ -52,6 +52,9 @@ curl --location --request POST 'http://localhost:3088/archives' \
 Set the maximum retention allowed for an archive. 
 Default: `-1` no maximum
 
+## Helm & Kubernetes
+
+See [Helm doc](./infra/helm)
 
 > Note that `identifier` is optional. If not provided, a generated one will be returned based on the files.
 

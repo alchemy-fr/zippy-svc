@@ -1,4 +1,7 @@
 Dockerfile
 .dockerignore
 /var
+/data/*
 /vendor
+.php_cs.cache
+.phpunit.result.cache

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 BASEDIR="$(dirname $0)"
 DIR="${BASEDIR}/../.."
 NS=${NS:-"zippy"}
@@ -7,6 +8,7 @@ CONTEXT=${CONTEXT:-"minikube"}
 RELEASE_NAME="zippy"
 CHART_DIR="${DIR}/infra/helm/zippy"
 VALUE_SRC="${DIR}/infra/helm/zippy/myvalues.yaml"
+
 kubectl config use-context ${CONTEXT}
 case $1 in
   uninstall)
