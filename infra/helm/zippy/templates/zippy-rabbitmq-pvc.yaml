@@ -1,0 +1,22 @@
+{{- with .Values.rabbitmq.persistence }}
+{{- if and .enabled (not .existingClaim) }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+  name: {{ include "zippy.fullname" $ }}-rabbitmq-pvc
+spec:
+  accessModes:
+    - {{ .accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .size | quote }}
+{{- if .storageClass }}
+{{- if (eq "-" .storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: {{ .storageClass | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

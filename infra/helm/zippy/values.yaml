@@ -1,0 +1,52 @@
+image:
+  registry: alchemyfr
+  tag: latest
+
+fullnameOverride:
+nameOverride:
+
+rabbitmq:
+  enabled: true
+  username: zippy
+  password: defineme
+  host: rabbitmq
+  port: 5672
+  vhost: /
+  externalSecretName:  
+  ssl: false
+  persistence:
+    enabled: true
+    existingClaim:
+    storageClass:
+    annotations: {}
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    subPath:
+
+zippy:
+  # You should defined restricted IP.
+  # or (/!\ insecured) '127.0.0.1,REMOTE_ADDR' to allow all proxies
+  trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+  database:
+    # i.e. postgres://user@pass:port/db-name
+    dsn:
+  persistence:
+    enabled: true
+    existingClaim:
+    storageClass:
+    annotations: {}
+    accessMode: ReadWriteOnce
+    subPath:
+    size: 5Gi
+
+  storage:
+    serveOnS3: false
+
+  client:
+    id: client
+    secret: secret
+
+
+ingress:
+  secretName:
+  hostname:

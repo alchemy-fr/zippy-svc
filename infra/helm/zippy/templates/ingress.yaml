@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "zippy.fullname" $ }}-ingress
+  annotations:
+  labels:
+spec:
+  rules:
+    - host: {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: zippy-nginx
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
+      secretName: {{ .Values.ingress.secretName }}
+      

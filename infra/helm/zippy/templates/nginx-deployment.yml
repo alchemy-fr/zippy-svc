@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zippy.fullname" $ }}-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zippy
+      tier: nginx
+  template:
+    metadata:
+      labels:
+        app: zippy
+        tier: nginx
+    spec:
+      containers:
+      - name: zippy-nginx
+        image: {{ $.Values.image.registry }}/zippy-api-nginx:{{ $.Values.image.tag }}
+        terminationMessagePolicy: FallbackToLogsOnError
+

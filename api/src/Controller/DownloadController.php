@@ -48,11 +48,9 @@ class DownloadController extends AbstractController
         $path = $archiveManager->getArchivePath($archive);
 
         return new StreamedResponse(function () use ($path): void {
-            $resource = fopen($path, 'rb');
-            while (!feof($resource)) {
-                echo fread($resource, 8192);
-            }
-            fclose($resource);
+            ob_clean();
+            flush();
+            readfile($path);
         }, 200, [
             'Content-Description' => 'File Transfer',
             'Content-Type' => 'application/zip',
