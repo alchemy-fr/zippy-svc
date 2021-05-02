@@ -9,7 +9,8 @@ rabbitmq:
   enabled: true
   username: zippy
   password: defineme
-  host: rabbitmq
+  # Define host only if rabbitmq service is disabled
+  host:
   port: 5672
   vhost: /
   externalSecretName:  

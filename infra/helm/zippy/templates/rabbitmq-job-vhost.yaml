@@ -3,24 +3,25 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $jobName }}-script
+  name: {{ include "zippy.fullname" $ }}-{{ $jobName }}-script
 data:
   job.sh: |
     #!/bin/sh
     set -ex
 
+    HOST="{{ include "zippy.fullname" $ }}-rabbitmq"
     n=0
     until [ "$n" -ge 20 ]; do
-      rabbitmqctl -n rabbit@rabbitmq await_startup && break
+      rabbitmqctl -n rabbit@${HOST} await_startup && break
       n=$((n+1))
       sleep 5
     done
 
-    rabbitmqctl -n rabbit@rabbitmq await_startup
+    rabbitmqctl -n rabbit@${HOST} await_startup
 {{- if .enabled }}
     VHOST="{{ index .vhost }}"
-    rabbitmqctl -n rabbit@rabbitmq add_vhost ${VHOST}
-    rabbitmqctl -n rabbit@rabbitmq set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
+    rabbitmqctl -n rabbit@${HOST} add_vhost ${VHOST}
+    rabbitmqctl -n rabbit@${HOST} set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
 {{- end }}
 {{- end }}
 ---
@@ -28,7 +29,7 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ $jobName }}
+  name: {{ include "zippy.fullname" $ }}-{{ $jobName }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
@@ -38,7 +39,7 @@ spec:
       volumes:
       - name: scripts
         configMap:
-          name: {{ $jobName }}-script
+          name: {{ include "zippy.fullname" $ }}-{{ $jobName }}-script
           defaultMode: 0777
       containers:
       - name: rabbitmq
@@ -52,7 +53,7 @@ spec:
         - secretRef:
             name: {{ include "zippy.fullname" $ }}-rabbitmq
         - configMapRef:
-            name: rabbitmq-config
+            name: {{ include "zippy.fullname" $ }}-rabbitmq-config
       restartPolicy: Never
   backoffLimit: 10
 {{- end }}

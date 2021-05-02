@@ -3,10 +3,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rabbitmq-config
+  name: {{ include "zippy.fullname" $ }}-rabbitmq-config
 data:
-  RABBITMQ_NODENAME: "rabbit@rabbitmq"
-  RABBITMQ_ERLANG_COOKIE: "H#75$3CjoTKn3129DNwcqlHvhfqs15"
+  RABBITMQ_NODENAME: "rabbit@{{ include "zippy.fullname" $ }}-rabbitmq"
+  RABBITMQ_ERLANG_COOKIE: "nUhtWhdRmqbhnEYIiwlC"
   ERL_EPMD_PORT: "55950"
 {{- end }}
 {{- end }}
