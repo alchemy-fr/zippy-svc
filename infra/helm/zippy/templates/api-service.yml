@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: zippy-api
+  name: {{ include "zippy.fullname" $ }}-api
 spec:
   ports:
   - name: tcp

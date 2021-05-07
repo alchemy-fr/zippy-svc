@@ -1,9 +1,8 @@
+{{- if Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ include "zippy.fullname" $ }}-ingress
-  annotations:
-  labels:
 spec:
   rules:
     - host: {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
@@ -13,10 +12,28 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: zippy-api
+                name: {{ include "zippy.fullname" $ }}-api
                 port:
                   number: 80
   tls:
     - hosts:
         - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
       secretName: {{ .Values.ingress.secretName }}
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "zippy.fullname" $ }}-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: {{ include "zippy.fullname" $ }}-api
+          servicePort: 80
+  tls:
+    - hosts:
+        - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
+      secretName: {{ .Values.ingress.secretName }}
+{{- end }}
