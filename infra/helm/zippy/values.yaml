@@ -8,12 +8,15 @@ nameOverride:
 rabbitmq:
   enabled: true
   username: zippy
-  password: defineme
+  password: define-me
   # Define host only if rabbitmq service is disabled
   host:
   port: 5672
   vhost: /
-  externalSecretName:  
+  externalSecretName:
+  externalSecretMap:
+    username: RABBITMQ_USER
+    password: RABBITMQ_PASSWORD
   ssl: false
   persistence:
     enabled: true

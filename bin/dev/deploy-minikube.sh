@@ -7,9 +7,10 @@ NS=${NS:-"zippy"}
 CONTEXT=${CONTEXT:-"minikube"}
 RELEASE_NAME="zippy"
 CHART_DIR="${DIR}/infra/helm/zippy"
-VALUE_SRC="${DIR}/infra/helm/zippy/myvalues.yaml"
+VALUE_SRC="${DIR}/bin/dev/myvalues.yaml"
 
 kubectl config use-context ${CONTEXT}
+
 case $1 in
   uninstall)
     helm uninstall ${RELEASE_NAME} || true;

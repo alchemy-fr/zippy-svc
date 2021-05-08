@@ -10,3 +10,24 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "zippy.rabbitmqCredentials" -}}
+{{- with .Values.rabbitmq }}
+{{- if .externalSecretName }}
+{{- if .externalSecretMap.username }}
+- name: RABBITMQ_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ .externalSecretName }}
+      key: {{ .externalSecretMap.username }}
+{{- end }}
+{{- if .externalSecretMap.password }}
+- name: RABBITMQ_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .externalSecretName }}
+      key: {{ .externalSecretMap.password }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end -}}

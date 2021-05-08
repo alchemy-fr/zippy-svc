@@ -1,0 +1,5 @@
+ingress:
+  hostname: zippy
+
+rabbitmq:
+  externalSecretName: foo

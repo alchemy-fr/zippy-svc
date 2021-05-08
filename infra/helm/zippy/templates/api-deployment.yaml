@@ -33,6 +33,7 @@ spec:
         env:
           - name: TRUSTED_PROXIES
             value: {{ required "Missing zippy.trustedProxies" .trustedProxies | default "127.0.0.1" | quote }}
+          {{- include "zippy.rabbitmqCredentials" $ | indent 10 }}
         envFrom:
           - secretRef:
               name: {{ include "zippy.fullname" $ }}-rabbitmq

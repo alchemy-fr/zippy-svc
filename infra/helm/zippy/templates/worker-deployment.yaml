@@ -30,6 +30,8 @@ spec:
         volumeMounts:
           - name: data
             mountPath: "/data"
+        env:
+          {{- include "zippy.rabbitmqCredentials" $ | indent 10 }}
         envFrom:
           - secretRef:
               name: {{ include "zippy.fullname" $ }}-rabbitmq

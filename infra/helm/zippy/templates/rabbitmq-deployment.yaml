@@ -41,13 +41,13 @@ spec:
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
             secretKeyRef:
-              name: {{ include "zippy.fullname" $ }}-rabbitmq
-              key: RABBITMQ_USER
+              name: {{ .externalSecretName | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}
+              key: {{ ternary "RABBITMQ_USER" .externalSecretMap.username (empty .externalSecretName) }}
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ include "zippy.fullname" $ }}-rabbitmq
-              key: RABBITMQ_PASSWORD
+              name: {{ .externalSecretName | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}-rabbitmq
+              key: {{ ternary "RABBITMQ_PASSWORD" .externalSecretMap.password (empty .externalSecretName) }}
         envFrom:
         - configMapRef:
             name: {{ include "zippy.fullname" $ }}-rabbitmq-config
