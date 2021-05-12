@@ -46,7 +46,7 @@ spec:
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: {{ .externalSecretName | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}-rabbitmq
+              name: {{ .externalSecretName | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}
               key: {{ ternary "RABBITMQ_PASSWORD" .externalSecretMap.password (empty .externalSecretName) }}
         envFrom:
         - configMapRef:

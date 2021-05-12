@@ -9,7 +9,7 @@ data:
     #!/bin/sh
     set -ex
 
-    HOST="{{ include "zippy.fullname" $ }}-rabbitmq"
+    HOST="{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
     n=0
     until [ "$n" -ge 20 ]; do
       rabbitmqctl -n rabbit@${HOST} await_startup && break
