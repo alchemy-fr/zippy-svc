@@ -54,8 +54,6 @@ spec:
         envFrom:
         - secretRef:
             name: {{ include "zippy.fullname" $ }}-rabbitmq
-        - configMapRef:
-            name: {{ include "zippy.fullname" $ }}-rabbitmq-config
       restartPolicy: Never
   backoffLimit: 10
 {{- end }}
