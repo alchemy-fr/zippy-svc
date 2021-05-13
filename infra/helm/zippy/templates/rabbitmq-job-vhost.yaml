@@ -1,5 +1,6 @@
 {{ $jobName := "rabbitmq-vhost-setup" }}
 {{- with .Values.rabbitmq }}
+{{- if .setupVhost }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,20 +13,16 @@ data:
     HOST="{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
     n=0
     until [ "$n" -ge 20 ]; do
-      rabbitmqctl -n rabbit@${HOST} await_startup && break
+      rabbitmqctl -n ${RABBITMQ_USER}@${HOST} await_startup && break
       n=$((n+1))
       sleep 5
     done
 
-    rabbitmqctl -n rabbit@${HOST} await_startup
-{{- if .enabled }}
+    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} await_startup
     VHOST="{{ index .vhost }}"
-    rabbitmqctl -n rabbit@${HOST} add_vhost ${VHOST}
-    rabbitmqctl -n rabbit@${HOST} set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
-{{- end }}
-{{- end }}
+    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} add_vhost ${VHOST}
+    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
 ---
-{{- with .Values.rabbitmq }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -50,12 +47,13 @@ spec:
           mountPath: /setup/job.sh
           subPath: job.sh
         env:
-          {{- include "zippy.rabbitmqCredentials" $ | indent 10 }}
+        {{- include "zippy.rabbitmqCredentials" $ | indent 8 }}
         envFrom:
         - secretRef:
             name: {{ include "zippy.fullname" $ }}-rabbitmq
+        - configMapRef:
+            name: {{ include "zippy.fullname" $ }}-rabbitmq-config
       restartPolicy: Never
   backoffLimit: 10
 {{- end }}
-
----
+{{- end }}

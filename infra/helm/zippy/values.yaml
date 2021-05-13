@@ -13,6 +13,9 @@ rabbitmq:
   host:
   port: 5672
   vhost: /
+  epmdPort: 55950
+  erlangCookie: nUhtWhdRmqbhnEYIiwlC
+  setupVhost: true
   externalSecretName:
   externalSecretMap:
     username: RABBITMQ_USER

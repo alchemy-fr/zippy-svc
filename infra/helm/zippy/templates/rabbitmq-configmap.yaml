@@ -1,12 +1,10 @@
 {{- with .Values.rabbitmq }}
-{{- if .enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "zippy.fullname" $ }}-rabbitmq-config
 data:
-  RABBITMQ_NODENAME: "rabbit@{{ include "zippy.fullname" $ }}-rabbitmq"
-  RABBITMQ_ERLANG_COOKIE: "nUhtWhdRmqbhnEYIiwlC"
-  ERL_EPMD_PORT: "55950"
-{{- end }}
+  RABBITMQ_NODENAME: "{{ .username }}@{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
+  RABBITMQ_ERLANG_COOKIE: {{ .erlangCookie | quote }}
+  ERL_EPMD_PORT: {{ .epmdPort | quote }}
 {{- end }}
