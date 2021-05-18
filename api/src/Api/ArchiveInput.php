@@ -33,6 +33,13 @@ final class ArchiveInput
      */
     private array $files = [];
 
+    /**
+     * The filename without extension.
+     *
+     * @Groups({"archive:write"})
+     */
+    private ?string $downloadFilename = null;
+
     public function getIdentifier(): ?string
     {
         return $this->identifier;
@@ -61,5 +68,15 @@ final class ArchiveInput
     public function setExpiresIn(?int $expiresIn): void
     {
         $this->expiresIn = $expiresIn;
+    }
+
+    public function getDownloadFilename(): ?string
+    {
+        return $this->downloadFilename;
+    }
+
+    public function setDownloadFilename(?string $downloadFilename): void
+    {
+        $this->downloadFilename = $downloadFilename;
     }
 }

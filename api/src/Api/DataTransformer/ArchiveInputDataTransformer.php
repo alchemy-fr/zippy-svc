@@ -46,6 +46,10 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
 
         $object = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new Archive();
 
+        if (null !== $data->getDownloadFilename()) {
+            $object->setDownloadFilename($data->getDownloadFilename());
+        }
+
         if ($isNew) {
             $identifier = $data->getIdentifier() ?? $this->identifierGenerator->generateIdentifier($data->getFiles());
             $object->setIdentifier($identifier);

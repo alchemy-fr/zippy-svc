@@ -47,6 +47,8 @@ class DownloadController extends AbstractController
 
         $path = $archiveManager->getArchivePath($archive);
 
+        $downloadFilename = $archive->getDownloadFilename() ?? 'download';
+
         return new StreamedResponse(function () use ($path): void {
             ob_clean();
             flush();
@@ -54,7 +56,7 @@ class DownloadController extends AbstractController
         }, 200, [
             'Content-Description' => 'File Transfer',
             'Content-Type' => 'application/zip',
-            'Content-Disposition' => 'attachment; filename="download.zip"',
+            'Content-Disposition' => sprintf('attachment; filename="%s.zip"', $downloadFilename),
             'Content-Length' => (string) filesize($path),
             'Expires' => '0',
             'Cache-Control' => 'must-revalidate',

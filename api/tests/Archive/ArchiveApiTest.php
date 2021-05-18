@@ -23,6 +23,7 @@ class ArchiveApiTest extends AbstractZippyTestCase
         $response = $this->request('POST', '/archives', [
             'identifier' => $identifier,
             'files' => $files,
+            'downloadFilename' => 'foo',
         ]);
 
         $json = json_decode($response->getContent(), true);
@@ -43,6 +44,15 @@ class ArchiveApiTest extends AbstractZippyTestCase
 
         $archivePath = $this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip';
         $this->assertTrue(file_exists($archivePath));
+
+        $response = $this->request('GET', $json['downloadUrl']);
+        $html = $response->getContent();
+        if (1 !== preg_match('#document\.location = \'([^\']+)\'#', $html, $matches)) {
+            throw new \Exception('Cannot find redirect location in HTML');
+        }
+        $downloadUrl = $matches[1];
+        $response = $this->request('GET', $downloadUrl);
+        $this->assertEquals('attachment; filename="foo.zip"', $response->headers->get('Content-Disposition'));
 
         $this->removeArchive($id);
     }

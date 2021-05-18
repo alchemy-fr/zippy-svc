@@ -99,6 +99,11 @@ class Archive
      */
     private int $status = self::STATUS_CREATED;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private ?string $downloadFilename = null;
+
     public function __construct()
     {
         $this->id = Uuid::uuid4();
@@ -189,5 +194,15 @@ class Archive
     public function setExpiresAt(?DateTime $expiresAt): void
     {
         $this->expiresAt = $expiresAt;
+    }
+
+    public function getDownloadFilename(): ?string
+    {
+        return $this->downloadFilename;
+    }
+
+    public function setDownloadFilename(?string $downloadFilename): void
+    {
+        $this->downloadFilename = $downloadFilename;
     }
 }
