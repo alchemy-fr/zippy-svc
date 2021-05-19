@@ -1,17 +1,14 @@
 version: '3.7'
 
 services:
-  fpm:
+  api:
     volumes:
       - ./api:/srv/app
     environment:
       - APP_ENV=dev
       - DATA_DIR=%kernel.project_dir%/data
       - DATABASE_URL=sqlite:///%kernel.project_dir%/data/zippy.db
-
-  nginx:
-    volumes:
-      - ./api/public:/srv/app/public
+      - TRUSTED_PROXIES=127.0.0.1,REMOTE_ADDR
 
   worker:
     volumes:
