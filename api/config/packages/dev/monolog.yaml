@@ -1,0 +1,21 @@
+monolog:
+    handlers:
+        console_filter:
+            type: filter
+            handler: stderr
+            channels:
+                - '!event'
+                - '!php'
+
+        stderr:
+            type: stream
+            path: php://stderr
+            level:    debug
+
+        console:
+            type: console
+            process_psr_3_messages: false
+            bubble: false
+            channels:
+                - '!event'
+                - '!php'
