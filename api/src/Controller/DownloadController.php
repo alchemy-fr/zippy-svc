@@ -6,10 +6,12 @@ namespace App\Controller;
 
 use App\Archive\ArchiveManager;
 use App\Entity\Archive;
+use App\Security\JWTManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,8 +21,14 @@ class DownloadController extends AbstractController
     /**
      * @Route("/archives/{id}/download", name="download_archive")
      */
-    public function __invoke(string $id, Request $request, ArchiveManager $archiveManager): Response
+    public function __invoke(string $id, Request $request, ArchiveManager $archiveManager, JWTManager $JWTManager): Response
     {
+        $jwt = $request->query->get('jwt');
+        if (null === $jwt) {
+            throw new BadRequestHttpException('Missing JWT');
+        }
+        $JWTManager->validateJWT($id, $jwt);
+
         $archive = $archiveManager->getArchive($id);
         if (!$archive instanceof Archive) {
             throw new NotFoundHttpException(sprintf('Archive %s not found', $id));
@@ -38,6 +46,7 @@ class DownloadController extends AbstractController
             $url = $this->generateUrl('download_archive', [
                 'id' => $id,
                 'c' => '1',
+                'jwt' => $JWTManager->getArchiveJWT($archive->getId(), 30)
             ], UrlGeneratorInterface::ABSOLUTE_URL);
 
             return $this->render('download.html.twig', [

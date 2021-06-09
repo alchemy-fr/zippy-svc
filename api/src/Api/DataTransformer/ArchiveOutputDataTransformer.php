@@ -7,15 +7,18 @@ namespace App\Api\DataTransformer;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use App\Api\ArchiveOutput;
 use App\Entity\Archive;
+use App\Security\JWTManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ArchiveOutputDataTransformer implements DataTransformerInterface
 {
     private UrlGeneratorInterface $urlGenerator;
+    private JWTManager $JWTManager;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(UrlGeneratorInterface $urlGenerator, JWTManager $JWTManager)
     {
         $this->urlGenerator = $urlGenerator;
+        $this->JWTManager = $JWTManager;
     }
 
     /**
@@ -33,6 +36,7 @@ class ArchiveOutputDataTransformer implements DataTransformerInterface
 
         $output->setDownloadUrl($this->urlGenerator->generate('download_archive', [
             'id' => $object->getId(),
+            'jwt' => $this->JWTManager->getArchiveJWT($object->getId()),
         ], UrlGeneratorInterface::ABSOLUTE_URL));
 
         return $output;

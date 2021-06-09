@@ -58,3 +58,8 @@ services:
     App\Api\DataTransformer\ArchiveInputDataTransformer:
         arguments:
             $maxExpirationTime: '%env(int:MAX_EXPIRATION_TIME)%'
+
+    App\Security\JWTManager:
+        arguments:
+            $signingKey: '%env(APP_SECRET)%'
+            $ttl: '%env(int:JWT_TTL)%'
