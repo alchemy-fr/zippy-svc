@@ -91,7 +91,7 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         }
         $this->assertEquals('created', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
-        $this->assertEquals(sprintf('http://localhost/archives/%s/download', $id), $json['downloadUrl']);
+        $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
 
         $archive = $this->getArchiveFromDatabase($id);
         $this->expectedFiles($files, $archive);
