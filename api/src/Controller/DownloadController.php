@@ -59,9 +59,14 @@ class DownloadController extends AbstractController
         $downloadFilename = $archive->getDownloadFilename() ?? 'download';
 
         return new StreamedResponse(function () use ($path): void {
-            ob_end_clean();
-            flush();
+            $obActive = ob_get_level() > 0;
+            if ($obActive) {
+                ob_end_clean();
+            }
             readfile($path);
+            if ($obActive) {
+                ob_start();
+            }
         }, 200, [
             'Content-Description' => 'File Transfer',
             'Content-Type' => 'application/zip',

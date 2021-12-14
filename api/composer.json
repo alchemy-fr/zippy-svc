@@ -17,6 +17,7 @@
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/doctrine-migrations-bundle": "^3.1",
+        "doctrine/dbal": "^2.13",
         "doctrine/orm": "^2.8",
         "guzzlehttp/guzzle": "^7.3",
         "lcobucci/jwt": "^4.1",

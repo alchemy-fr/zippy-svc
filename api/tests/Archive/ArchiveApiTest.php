@@ -51,7 +51,12 @@ class ArchiveApiTest extends AbstractZippyTestCase
             throw new \Exception('Cannot find redirect location in HTML');
         }
         $downloadUrl = $matches[1];
+
+        ob_start();
+        ob_start();
         $response = $this->request('GET', $downloadUrl);
+        ob_end_clean();
+        ob_end_clean();
         $this->assertEquals('attachment; filename="foo.zip"', $response->headers->get('Content-Disposition'));
 
         $this->removeArchive($id);
