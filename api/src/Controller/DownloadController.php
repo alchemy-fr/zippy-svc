@@ -59,7 +59,7 @@ class DownloadController extends AbstractController
         $downloadFilename = $archive->getDownloadFilename() ?? 'download';
 
         return new StreamedResponse(function () use ($path): void {
-            ob_clean();
+            ob_end_clean();
             flush();
             readfile($path);
         }, 200, [
