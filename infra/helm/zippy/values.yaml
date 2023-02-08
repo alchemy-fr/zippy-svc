@@ -59,5 +59,6 @@ zippy:
     replicas: 1
 
 ingress:
+  enabled: true
   secretName:
   hostname:
