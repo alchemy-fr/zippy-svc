@@ -10,6 +10,10 @@ fi
 
 chown 1000:1000 /data
 
+if [ "${APP_ENV}" == "prod" ]; then
+    su app -c "bin/console cache:clear"
+fi
+
 su app -c 'bin/console app:setup'
 
 exec "$@"
