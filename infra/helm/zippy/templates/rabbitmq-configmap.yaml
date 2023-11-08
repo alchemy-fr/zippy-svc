@@ -5,6 +5,8 @@ metadata:
   name: {{ include "zippy.fullname" $ }}-rabbitmq-config
 data:
   RABBITMQ_NODENAME: "{{ .username }}@{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
+  {{- if .erlangCookie }}
   RABBITMQ_ERLANG_COOKIE: {{ .erlangCookie | quote }}
+  {{- end }}
   ERL_EPMD_PORT: {{ .epmdPort | quote }}
 {{- end }}
