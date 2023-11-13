@@ -1,28 +1,6 @@
 {{ $jobName := "rabbitmq-vhost-setup" }}
 {{- with .Values.rabbitmq }}
 {{- if .setupVhost }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "zippy.fullname" $ }}-{{ $jobName }}-script
-data:
-  job.sh: |
-    #!/bin/sh
-    set -ex
-
-    HOST="{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
-    n=0
-    until [ "$n" -ge 20 ]; do
-      rabbitmqctl -n ${RABBITMQ_USER}@${HOST} await_startup && break
-      n=$((n+1))
-      sleep 5
-    done
-
-    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} await_startup
-    VHOST="{{ index .vhost }}"
-    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} add_vhost ${VHOST}
-    rabbitmqctl -n ${RABBITMQ_USER}@${HOST} set_permissions -p ${VHOST} ${RABBITMQ_USER} '.*' '.*' '.*'
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -33,19 +11,23 @@ metadata:
 spec:
   template:
     spec:
-      volumes:
-      - name: scripts
-        configMap:
-          name: {{ include "zippy.fullname" $ }}-{{ $jobName }}-script
-          defaultMode: 0777
       containers:
       - name: rabbitmq
         image: rabbitmq:3.7.14-management
-        args: ["/setup/job.sh"]
-        volumeMounts:
-        - name: scripts
-          mountPath: /setup/job.sh
-          subPath: job.sh
+        args:
+          - |
+            #!/bin/sh
+            set -ex
+            n=0
+            until [ "$n" -ge 20 ]; do
+            rabbitmqctl -n {{ .nodeName }} await_startup && break
+            n=$((n+1))
+            sleep 5
+            done
+        
+            rabbitmqctl -n ${{ .nodeName }} await_startup
+            rabbitmqctl -n {{ .nodeName }} add_vhost {{ .vhost | quote }}
+            rabbitmqctl -n {{ .nodeName }} set_permissions -p {{ .vhost | quote }} ${RABBITMQ_USER} '.*' '.*' '.*'
         env:
         {{- include "zippy.rabbitmqCredentials" $ | indent 8 }}
         envFrom:

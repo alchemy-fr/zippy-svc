@@ -13,7 +13,7 @@ rabbitmq:
   host:
   port: 5672
   vhost: /
-  nodeName:
+  nodeName: zippy@rabbitmq
   epmdPort: 55950
   erlangCookie: 'nUhtWhdRmqbhnEYIiwlC'
   setupVhost: true
