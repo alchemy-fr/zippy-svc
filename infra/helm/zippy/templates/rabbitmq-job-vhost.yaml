@@ -26,7 +26,7 @@ spec:
             sleep 5
             done
         
-            rabbitmqctl -n ${{ .nodeName }} await_startup
+            rabbitmqctl -n {{ .nodeName }} await_startup
             rabbitmqctl -n {{ .nodeName }} add_vhost {{ .vhost | quote }}
             rabbitmqctl -n {{ .nodeName }} set_permissions -p {{ .vhost | quote }} ${RABBITMQ_USER} '.*' '.*' '.*'
         env:
