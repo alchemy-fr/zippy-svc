@@ -13,9 +13,9 @@ rabbitmq:
   host:
   port: 5672
   vhost: /
+  nodeName:
   epmdPort: 55950
-  # Define erlangCookie when you need to separate clusters (ex: nUhtWhdRmqbhnEYIiwlC)
-  erlangCookie:
+  erlangCookie: 'nUhtWhdRmqbhnEYIiwlC'
   setupVhost: true
   externalSecretName:
   externalSecretMap:

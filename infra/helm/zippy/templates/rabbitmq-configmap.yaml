@@ -4,9 +4,11 @@ kind: ConfigMap
 metadata:
   name: {{ include "zippy.fullname" $ }}-rabbitmq-config
 data:
-  {{- if .erlangCookie }}
+  {{- if .nodeName }}
+  RABBITMQ_NODENAME: {{ .nodeName | quote }}
+  {{- else }}
   RABBITMQ_NODENAME: "{{ .username }}@{{ .host | default (printf "%s-rabbitmq" (include "zippy.fullname" $)) }}"
+  {{- end }}
   RABBITMQ_ERLANG_COOKIE: {{ .erlangCookie | quote }}
   ERL_EPMD_PORT: {{ .epmdPort | quote }}
-  {{- end }}
 {{- end }}
