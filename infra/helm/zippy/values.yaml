@@ -63,3 +63,5 @@ ingress:
   enabled: true
   secretName:
   hostname:
+  annotations:
+  extraLabels:

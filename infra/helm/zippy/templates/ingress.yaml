@@ -1,4 +1,5 @@
-{{- if .Values.ingress.enabled }}
+{{- with .Values.ingress }}
+{{- if .enabled }}
 {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" -}}
 apiVersion: networking.k8s.io/v1
 {{- else if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1/Ingress" -}}
@@ -9,9 +10,18 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ include "zippy.fullname" $ }}-ingress
+{{- if .ingress.annotations }}
+  annotations:
+{{ toYaml .annotations | indent 4 }}
+{{- end }}
+{{- if .ingress.extraLabels }}
+  labels:
+{{ toYaml .extraLabels | indent 4 }}
+{{- end }}
 spec:
+  ingressClassName: nginx
   rules:
-    - host: {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
+    - host: {{ required "Missing ingress.hostname" .hostname | quote }}
       http:
         paths:
           - path: /
@@ -29,6 +39,7 @@ spec:
             {{- end }}
   tls:
     - hosts:
-        - {{ required "Missing ingress.hostname" .Values.ingress.hostname }}
-      secretName: {{ .Values.ingress.secretName }}
+        - {{ required "Missing ingress.hostname" .hostname }}
+      secretName: {{ .secretName | quote }}
+{{- end }}
 {{- end }}
