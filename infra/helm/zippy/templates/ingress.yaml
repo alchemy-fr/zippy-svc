@@ -10,11 +10,11 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ include "zippy.fullname" $ }}-ingress
-{{- if .ingress.annotations }}
+{{- if .annotations }}
   annotations:
 {{ toYaml .annotations | indent 4 }}
 {{- end }}
-{{- if .ingress.extraLabels }}
+{{- if .extraLabels }}
   labels:
 {{ toYaml .extraLabels | indent 4 }}
 {{- end }}
