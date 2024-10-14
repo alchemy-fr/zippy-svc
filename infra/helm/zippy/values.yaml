@@ -5,6 +5,8 @@ image:
 fullnameOverride:
 nameOverride:
 
+nodeSelector: {}
+
 rabbitmq:
   enabled: true
   username: zippy
