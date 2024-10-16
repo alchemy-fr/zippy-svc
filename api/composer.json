@@ -69,6 +69,19 @@
         "symfony/polyfill-iconv": "*",
         "symfony/polyfill-php72": "*"
     },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "test": "unset DATA_DIR DATABASE_URL && rm -f tests/data/test.db && bin/console doctrine:schema:create -e test && ./bin/phpunit"
+    },
     "conflict": {
         "symfony/symfony": "*"
     },
