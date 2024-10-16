@@ -13,6 +13,7 @@ jobs:
         run: |
           docker compose build
       - name: Test API
+        working-directory: ./api
         run: |
           docker compose run --rm -e APP_ENV=dev api /bin/ash -c 'composer install && composer test'
 
