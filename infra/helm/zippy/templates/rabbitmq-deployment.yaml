@@ -18,6 +18,9 @@ spec:
         app: zippy
         tier: rabbitmq
     spec:
+      {{- if $.Values.nodeSelector }}
+      nodeSelector: {{ toYaml $.Values.nodeSelector | nindent 8 }}
+      {{- end }}
       volumes:
       - name: rabbitmq
         {{- if .persistence.enabled }}

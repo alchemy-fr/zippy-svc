@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: build
         run: |
-          docker-compose build
+          docker compose build
       - name: Test API
         run: |
-          docker-compose run --rm -e APP_ENV=dev api /bin/ash -c 'composer install && composer test'
+          docker compose run --rm -e APP_ENV=dev api /bin/ash -c 'composer install && composer test'
 
       - name: Test HELM
         run: |
@@ -34,7 +34,7 @@ jobs:
       - name: Push images
         if: github.ref == 'refs/heads/main'
         run: |
-          docker-compose push
+          docker compose push
 
       - name: Publish Helm charts
         if: github.ref == 'refs/heads/main'
