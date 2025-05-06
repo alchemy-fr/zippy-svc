@@ -27,7 +27,7 @@ class ArchiveOutputProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ArchiveOutput
     {
-        $archiveId= $uriVariables['identifier'];
+        $archiveId= $uriVariables['id'];
         $object = $this->em->getRepository(Archive::class)->findOneBy(['id' => $archiveId]);
 
         if (null === $object) {

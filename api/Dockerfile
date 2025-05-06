@@ -6,10 +6,12 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		sqlite-dev \
 		icu-libs \
 		zlib \
-		libzip
+		libzip \
+        rabbitmq-c-dev
 
 ENV APCU_VERSION=5.1.24 \
     XDEBUG_VERSION=3.4 \
+    AMQP_VERSION=1.11.0 \
     APP_ENV=prod
 
 RUN set -eux \
@@ -28,9 +30,11 @@ RUN set -eux \
 		pdo_sqlite \
 	&& pecl install \
 		apcu-${APCU_VERSION} \
+        amqp-${AMQP_VERSION} \
 		xdebug-${XDEBUG_VERSION} \
 	&& docker-php-ext-enable --ini-name 20-apcu.ini apcu \
 	&& docker-php-ext-enable --ini-name 05-opcache.ini opcache \
+    && docker-php-ext-enable amqp \
 	&& apk del .build-deps
 
 # ------------------------ add nginx ------------------------

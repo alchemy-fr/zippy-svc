@@ -35,15 +35,15 @@ class ApiClientAuthenticator extends AbstractAuthenticator
         $auth = $request->headers->get('Authorization');
         $parts = explode(':', $auth, 2);
         if (2 !== count($parts)) {
-            throw new CustomUserMessageAuthenticationException('Invalid authorization');
+            throw new CustomUserMessageAuthenticationException('Invalid authorization explode');
         }
 
-        $userIdentifier = $parts[1];
+        $userIdentifier = $parts[0];
 
         try {
             $this->userProvider->loadUserByIdentifier($userIdentifier);
         } catch (UserNotFoundException) {
-            throw new CustomUserMessageAuthenticationException('Invalid authorization');
+            throw new CustomUserMessageAuthenticationException('Invalid authorization no user');
         }
 
         return new SelfValidatingPassport(new UserBadge($userIdentifier));       

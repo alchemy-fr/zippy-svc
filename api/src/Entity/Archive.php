@@ -8,35 +8,45 @@ use DateTime;
 use Ramsey\Uuid\Uuid;
 use App\Api\ArchiveInput;
 use App\Api\ArchiveOutput;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Ramsey\Uuid\UuidInterface;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidType;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Patch;
+use App\Repository\ArchiveRepository;
 use Gedmo\Mapping\Annotation as Gedmo;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Api\DataTransformer\ArchiveInputProcessor;
+use App\Api\DataTransformer\ArchiveOutputProvider;
 
 #[ApiResource(
    shortName: "archive",
    security: "is_granted('ROLE_API')",
    normalizationContext: [
-      "groups" => ["_", "archive:read"],
-     "skip_null_values" => false,
+    "groups" => ["_", "archive:read"],
+    "skip_null_values" => false,
    ],
    denormalizationContext: ["groups"=> ["archive:write"]],
    input: ArchiveInput::class,
    output: ArchiveOutput::class,
    operations: [
+        new GetCollection(),
+        new Post(),
         new Get(),
         new Patch(),
         new Delete()
-   ]
+   ],
+   processor: ArchiveInputProcessor::class,
+   provider: ArchiveOutputProvider::class
   )]
-#[ORM\Entity(repositoryClass: "App\Repository\ArchiveRepository")]
+#[ORM\Entity(repositoryClass: ArchiveRepository::class)]
+#[ORM\Table]
 class Archive
 {
     public const STATUS_CREATED = 0;

@@ -14,16 +14,14 @@ final class ArchiveInput
     /**
      * The external unique identifier.
      * It should include consumer service name to avoid conflicts.
-     *
-     * @Groups({"archive:write"})
      */
+     #[Groups(["archive:write"])]
     private ?string $identifier = null;
 
     /**
      * The archive TTL in seconds.
-     *
-     * @Groups({"archive:write"})
      */
+    #[Groups(["archive:write"])]
     private ?int $expiresIn = null;
 
     /**
@@ -35,9 +33,8 @@ final class ArchiveInput
 
     /**
      * The filename without extension.
-     *
-     * @Groups({"archive:write"})
      */
+    #[Groups(["archive:write"])]
     private ?string $downloadFilename = null;
 
     public function getIdentifier(): ?string

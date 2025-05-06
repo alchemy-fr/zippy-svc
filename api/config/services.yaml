@@ -26,8 +26,6 @@ services:
     _instanceof:
         Doctrine\Common\EventSubscriber:
             tags: ['doctrine.event_subscriber']
-        Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessageHandlerInterface:
-            tags: ['arthem_rabbit.event_handler']
         Symfony\Component\EventDispatcher\EventSubscriberInterface:
             tags: ['kernel.event_subscriber']
         App\Download\DownloadAdapterInterface:
