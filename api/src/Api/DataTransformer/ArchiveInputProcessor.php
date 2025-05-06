@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Api\DataTransformer;
 
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Validator\ValidatorInterface;
-use App\Api\ArchiveInput;
-use App\Archive\IdentifierGenerator;
-use App\Entity\Archive;
 use DateTime;
+use App\Entity\Archive;
+use ApiPlatform\Metadata\Operation;
+use App\Archive\IdentifierGenerator;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Validator\ValidatorInterface;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
+use Alchemy\Zippy\Archive\Archive as ArchiveArchive;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ArchiveInputDataTransformer implements DataTransformerInterface
+class ArchiveInputProcessor implements ProcessorInterface
 {
     private ValidatorInterface $validator;
     private IdentifierGenerator $identifierGenerator;
@@ -30,10 +31,7 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
         $this->maxExpirationTime = $maxExpirationTime;
     }
 
-    /**
-     * @param ArchiveInput $data
-     */
-    public function transform($data, string $to, array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Archive
     {
         $isNew = !isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]);
 
@@ -83,14 +81,5 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
         }
 
         return $object;
-    }
-
-    public function supportsTransformation($data, string $to, array $context = []): bool
-    {
-        if ($data instanceof Archive) {
-            return false;
-        }
-
-        return Archive::class === $to && ArchiveInput::class === ($context['input']['class'] ?? null);
     }
 }

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Api;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+
 use App\Entity\File;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 final class ArchiveInput
@@ -27,10 +28,9 @@ final class ArchiveInput
 
     /**
      * @var File[]
-     *
-     * @ApiProperty(readableLink=true)
-     * @Groups({"archive:write"})
      */
+    #[ApiProperty(readableLink:true)]
+    #[Groups(["archive:write"])]
     private array $files = [];
 
     /**

@@ -55,7 +55,7 @@ services:
 
     GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'
 
-    App\Api\DataTransformer\ArchiveInputDataTransformer:
+    App\Api\DataTransformer\ArchiveInputProcessor:
         arguments:
             $maxExpirationTime: '%env(int:MAX_EXPIRATION_TIME)%'
 
