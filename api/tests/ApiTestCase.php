@@ -39,10 +39,10 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
-        $this->client = static::createClient();
-        $this->client->disableReboot();
+        if (!static::$booted) {
+            $this->client = static::createClient();
+            $this->client->disableReboot();
+        }       
     }
 
     protected function tearDown(): void
@@ -58,7 +58,7 @@ abstract class ApiTestCase extends WebTestCase
 
     protected static function getEntityManager(): EntityManagerInterface
     {
-        return self::$container->get(EntityManagerInterface::class);
+        return self::getContainer()->get(EntityManagerInterface::class);
     }
 
     protected function clearEmBeforeApiCall(): void
