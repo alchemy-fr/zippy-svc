@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase as TestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase as TestCase;
 
 abstract class ApiTestCase extends TestCase
 {
@@ -41,8 +42,7 @@ abstract class ApiTestCase extends TestCase
         parent::setUp();
 
         $this->client = static::createClient();
-        // $this->client->disableReboot();
-     
+        $this->client->disableReboot();
     }
 
     protected function tearDown(): void
