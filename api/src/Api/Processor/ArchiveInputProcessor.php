@@ -14,7 +14,6 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
-use Alchemy\Zippy\Archive\Archive as ArchiveArchive;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

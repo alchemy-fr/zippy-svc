@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\AbstractBrowser;
-use Symfony\Component\HttpFoundation\Response;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase as TestCase;
+use ApiPlatform\Symfony\Bundle\Test\Client;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
-abstract class ApiTestCase extends WebTestCase
+abstract class ApiTestCase extends TestCase
 {
-    protected ?AbstractBrowser $client = null;
+
+    protected ?Client $client;
 
     protected function request(
         string $method,
@@ -20,29 +21,28 @@ abstract class ApiTestCase extends WebTestCase
         array $files = [],
         array $server = [],
         ?string $content = null
-    ): Response {
-        $server['CONTENT_TYPE'] = $server['CONTENT_TYPE'] ?? 'application/json';
-        $server['HTTP_ACCEPT'] = $server['HTTP_ACCEPT'] ?? 'application/json';
-        $server['HTTP_AUTHORIZATION'] = 'client:secret';
-
+    ): ResponseInterface {
+        
         if (empty($content) && !empty($params) && in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'], true)) {
             $content = json_encode($params);
         }
 
-        $this->client->request($method, $uri, $params, $files, $server, $content);
+        $headers['Authorization'] = 'client:secret';
+        $headers['Content-Type'] = $server['CONTENT_TYPE'] ?? 'application/json';
 
-        /** @var Response $response */
-        $response = $this->client->getResponse();
-
-        return $response;
+        return $this->client->request($method, $uri, [
+            'headers' => $headers, 
+            'json' => $params
+        ]);
     }
 
     protected function setUp(): void
     {
-        if (!static::$booted) {
-            $this->client = static::createClient();
-            $this->client->disableReboot();
-        }       
+        parent::setUp();
+
+        $this->client = static::createClient();
+        // $this->client->disableReboot();
+     
     }
 
     protected function tearDown(): void
