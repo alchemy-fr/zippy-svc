@@ -17,13 +17,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidType;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use App\Api\Processor\ArchiveInputProcessor;
 use App\Repository\ArchiveRepository;
 use Gedmo\Mapping\Annotation as Gedmo;
-use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Api\DataTransformer\ArchiveInputProcessor;
-use App\Api\DataTransformer\ArchiveOutputProvider;
 
 #[ApiResource(
    shortName: "archive",
@@ -33,17 +31,17 @@ use App\Api\DataTransformer\ArchiveOutputProvider;
     "skip_null_values" => false,
    ],
    denormalizationContext: ["groups"=> ["archive:write"]],
-   input: ArchiveInput::class,
-   output: ArchiveOutput::class,
    operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Patch(),
-        new Delete()
+       new Post(
+           input: ArchiveInput::class,
+           processor: ArchiveInputProcessor::class
+       ),
+       new Get(),
+       new Patch(),
+       new Delete(),
    ],
-   processor: ArchiveInputProcessor::class,
-   provider: ArchiveOutputProvider::class
+   input: ArchiveInput::class,
+   output: ArchiveOutput::class
   )]
 #[ORM\Entity(repositoryClass: ArchiveRepository::class)]
 #[ORM\Table]

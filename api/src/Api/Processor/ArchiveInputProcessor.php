@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Api\DataTransformer;
+namespace App\Api\Processor;
 
 use DateTime;
 use App\Entity\Archive;
 use ApiPlatform\Metadata\Operation;
 use App\Archive\IdentifierGenerator;
+use App\Consumer\Handler\BuildMessage;
+use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Alchemy\Zippy\Archive\Archive as ArchiveArchive;
-use App\Consumer\Handler\BuildMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -24,8 +25,10 @@ class ArchiveInputProcessor implements ProcessorInterface
     private ?int $maxExpirationTime;
     private Security $security;
     private MessageBusInterface $bus;
+    private EntityManagerInterface $em;
 
     public function __construct(
+        EntityManagerInterface $em,
         ValidatorInterface $validator,
         IdentifierGenerator $identifierGenerator,
         Security $security,
@@ -38,11 +41,11 @@ class ArchiveInputProcessor implements ProcessorInterface
         $this->maxExpirationTime = $maxExpirationTime;
         $this->security = $security;
         $this->bus = $bus;
+        $this->em = $em;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Archive
     {
-        
         $isNew = !isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]);
 
         $this->validator->validate($data, [
@@ -92,8 +95,11 @@ class ArchiveInputProcessor implements ProcessorInterface
 
         $object->setClient($this->security->getUser()->getUserIdentifier());
 
+        $this->em->persist($object);
+        $this->em->flush();
+        
         $this->bus->dispatch(new BuildMessage((['id' => $object->getId()])));
-
+        
         return $object;
     }
 }

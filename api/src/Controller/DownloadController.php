@@ -18,9 +18,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DownloadController extends AbstractController
 {
-    /**
-     * @Route("/archives/{id}/download", name="download_archive")
-     */
+    #[Route("/archives/{id}/download", name:"download_archive")]
     public function __invoke(string $id, Request $request, ArchiveManager $archiveManager, JWTManager $JWTManager): Response
     {
         $jwt = $request->query->get('jwt');
