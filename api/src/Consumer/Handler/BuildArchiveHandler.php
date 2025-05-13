@@ -8,7 +8,6 @@ use Throwable;
 use App\Entity\Archive;
 use Doctrine\DBAL\LockMode;
 use App\Archive\ArchiveManager;
-use App\Consumer\Handler\BuildMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,10 +24,9 @@ class BuildArchiveHandler
         $this->em = $em;
     }
 
-    public function __invoke(BuildMessage $message): void
+    public function __invoke(BuildArchive $message): void
     {
-        $payload = $message->getPayload();
-        $id = $payload['id'];
+        $id = $message->getId();
 
         $archive = $this->em->transactional(function () use ($id): ?Archive {
             $archive = $this->em->find(Archive::class, $id, LockMode::PESSIMISTIC_WRITE);

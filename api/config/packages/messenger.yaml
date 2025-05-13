@@ -12,9 +12,9 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'App\Consumer\Handler\BuildMessage': async
-            'App\Consumer\Handler\DeleteMessage': async
-            'App\Consumer\Handler\CleanMessage': async
+            'App\Consumer\Handler\BuildArchive': async
+            'App\Consumer\Handler\DeleteArchive': async
+            'App\Consumer\Handler\CleanOldArchives': async
 
 # when@test:
 #    framework:

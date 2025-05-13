@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Consumer\Handler\CleanMessage;
+use App\Consumer\Handler\CleanOldArchives;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -31,7 +31,7 @@ class CleanOldArchivesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->bus->dispatch(new CleanMessage([]));
+        $this->bus->dispatch(new CleanOldArchives());
 
         $output->writeln('Clean triggered!');
 

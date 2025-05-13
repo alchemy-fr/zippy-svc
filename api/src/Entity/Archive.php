@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidType;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use App\Api\Processor\ArchiveInputProcessor;
+use App\Api\Processor\ArchiveProcessor;
 use App\Repository\ArchiveRepository;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
@@ -34,7 +34,7 @@ use Doctrine\Common\Collections\ArrayCollection;
    operations: [
        new Post(
            input: ArchiveInput::class,
-           processor: ArchiveInputProcessor::class
+           processor: ArchiveProcessor::class
        ),
        new Get(),
        new Patch(),

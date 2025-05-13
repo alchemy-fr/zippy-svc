@@ -8,16 +8,16 @@ use DateTime;
 use App\Entity\Archive;
 use ApiPlatform\Metadata\Operation;
 use App\Archive\IdentifierGenerator;
-use App\Consumer\Handler\BuildMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
+use App\Consumer\Handler\BuildArchive;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ArchiveInputProcessor implements ProcessorInterface
+class ArchiveProcessor implements ProcessorInterface
 {
     private ValidatorInterface $validator;
     private IdentifierGenerator $identifierGenerator;
@@ -97,7 +97,7 @@ class ArchiveInputProcessor implements ProcessorInterface
         $this->em->persist($object);
         $this->em->flush();
         
-        $this->bus->dispatch(new BuildMessage((['id' => $object->getId()])));
+        $this->bus->dispatch(new BuildArchive($object->getId()));
         
         return $object;
     }

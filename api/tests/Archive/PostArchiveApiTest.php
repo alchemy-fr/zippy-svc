@@ -29,12 +29,12 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
-                'uri' => $filePrefix.'/five.jpg',
-                'path' => 'one/two/five.jpg',
+                'uri' => $filePrefix.'/three.jpg',
+                'path' => 'one/two/three.jpg',
             ],
             [
-                'uri' => $filePrefix.'/six.txt',
-                'path' => 'six.txt',
+                'uri' => $filePrefix.'/four.txt',
+                'path' => 'four.txt',
             ],
         ];
         $this->doTestPostArchiveOK($files, ['identifier' => 'my_unique_id']);
@@ -45,12 +45,12 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
-                'uri' => $filePrefix.'/seven.jpg',
-                'path' => 'one/two/seven.jpg',
+                'uri' => $filePrefix.'/five.jpg',
+                'path' => 'one/two/five.jpg',
             ],
             [
-                'uri' => $filePrefix.'/eight.txt',
-                'path' => 'eight.txt',
+                'uri' => $filePrefix.'/six.txt',
+                'path' => 'six.txt',
             ],
         ];
         $this->doTestPostArchiveOK($files, ['expiresIn' => 300]);
@@ -96,35 +96,36 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
     }
 
-    // public function testPostArchiveWithEmptyIdentifierReturns422(): void
-    // {
-    //     $filePrefix = $this->getTestDataSetDir();
-    //     $files = [
-    //         [
-    //             'uri' => $filePrefix.'/three.jpg',
-    //             'path' => 'one/two/three.jpg',
-    //         ],
-    //         [
-    //             'uri' => $filePrefix.'/four.txt',
-    //             'path' => 'four.txt',
-    //         ],
-    //     ];
-    //     $response = $this->request('POST', '/archives', [
-    //         'identifier' => '',
-    //         'files' => $files,
-    //     ]);
+    public function testPostArchiveWithEmptyIdentifierReturns422(): void
+    {
+        $filePrefix = $this->getTestDataSetDir();
+        $files = [
+            [
+                'uri' => $filePrefix.'/three.jpg',
+                'path' => 'one/two/three.jpg',
+            ],
+            [
+                'uri' => $filePrefix.'/four.txt',
+                'path' => 'four.txt',
+            ],
+        ];
 
-    //     $this->assertEquals(422, $response->getStatusCode());
-    //     $this->assertEquals('application/problem+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
-    // }
+        $response = $this->request('POST', '/archives', [
+            'identifier' => '',
+            'files' => $files,
+        ]);
+        
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders(false)['content-type'][0]);
+    }
 
-    // public function testPostArchiveWithEmptyFilesReturns422(): void
-    // {
-    //     $response = $this->request('POST', '/archives', [
-    //         'files' => [],
-    //     ]);
+    public function testPostArchiveWithEmptyFilesReturns422(): void
+    {
+        $response = $this->request('POST', '/archives', [
+            'files' => [],
+        ]);
 
-    //     $this->assertEquals(422, $response->getStatusCode());
-    //     $this->assertEquals('application/problem+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
-    // }
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders(false)['content-type'][0]);
+    }
 }

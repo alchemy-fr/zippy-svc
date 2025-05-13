@@ -18,7 +18,7 @@ class DeleteArchiveHandler
     {
     }
 
-    public function __invoke(DeleteMessage $message): void
+    public function __invoke(DeleteArchive $message): void
     {
         $payload = $message->getPayload();
         $id = $payload['id'];
