@@ -45,8 +45,12 @@ class ArchiveProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Archive
     {
-        $isNew = !isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]);
 
+        $isNew = false;
+        if ($operation instanceof \ApiPlatform\Metadata\Post) {
+            $isNew = true;
+        }
+       
         $this->validator->validate($data, [
             'groups' => [
                 'Default',
@@ -54,7 +58,14 @@ class ArchiveProcessor implements ProcessorInterface
             ],
         ]);
 
-        $object = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new Archive();
+        if ($isNew) {
+            $object = new Archive();
+        } else {
+            $object = $this->em->find(Archive::class, $uriVariables['id']);
+            if (null === $object) {
+                throw new BadRequestHttpException('Archive not found');
+            }
+        }
 
         if (null !== $data->getDownloadFilename()) {
             $object->setDownloadFilename($data->getDownloadFilename());

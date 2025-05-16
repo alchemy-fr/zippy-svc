@@ -83,7 +83,7 @@ class ArchiveApiTest extends AbstractZippyTestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $archive = $this->getArchiveFromDatabase($archive->getId());
-        // $this->expectedFiles($files, $archive);
+        $this->expectedFiles($files, $archive);
     }
 
     public function testDeleteArchive(): void

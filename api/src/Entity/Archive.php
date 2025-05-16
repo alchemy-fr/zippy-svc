@@ -37,10 +37,12 @@ use Doctrine\Common\Collections\ArrayCollection;
            processor: ArchiveProcessor::class
        ),
        new Get(),
-       new Patch(),
+       new Patch(
+            input: ArchiveInput::class,
+            processor: ArchiveProcessor::class
+       ),
        new Delete(),
    ],
-   input: ArchiveInput::class,
    output: ArchiveOutput::class
   )]
 #[ORM\Entity(repositoryClass: ArchiveRepository::class)]
