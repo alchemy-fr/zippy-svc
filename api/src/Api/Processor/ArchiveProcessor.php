@@ -8,13 +8,13 @@ use DateTime;
 use App\Entity\Archive;
 use ApiPlatform\Metadata\Operation;
 use App\Archive\IdentifierGenerator;
+use App\Consumer\Handler\BuildArchive;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use ApiPlatform\Validator\ValidatorInterface;
-use ApiPlatform\Serializer\AbstractItemNormalizer;
-use App\Consumer\Handler\BuildArchive;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ArchiveProcessor implements ProcessorInterface
@@ -63,7 +63,7 @@ class ArchiveProcessor implements ProcessorInterface
         } else {
             $object = $this->em->find(Archive::class, $uriVariables['id']);
             if (null === $object) {
-                throw new BadRequestHttpException('Archive not found');
+                throw new NotFoundHttpException('Archive not found');
             }
         }
 
