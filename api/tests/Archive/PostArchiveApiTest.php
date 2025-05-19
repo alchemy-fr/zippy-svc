@@ -91,12 +91,17 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         } else {
             $this->assertNull($json['expiresAt']);
         }
-        $this->assertEquals('created', $json['status']);
+        $this->assertEquals('ready', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
         $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
     
         $archive = $this->getArchiveFromDatabase($id);
         $this->expectedFiles($files, $archive);  
+
+        $archivePath = $this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip';
+        $this->assertTrue(file_exists($archivePath));
+
+        $this->removeArchive($id);
     }
 
     public function testPostArchiveWithEmptyIdentifierReturns422(): void

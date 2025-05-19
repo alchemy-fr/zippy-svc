@@ -6,7 +6,7 @@ namespace App\Consumer\Handler;
 
 class BuildArchive
 {
-    public function __construct(private string $id = '')
+    public function __construct(private string $id)
     {
     }
     

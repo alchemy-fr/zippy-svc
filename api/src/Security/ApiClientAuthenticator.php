@@ -35,7 +35,7 @@ class ApiClientAuthenticator extends AbstractAuthenticator
         $auth = $request->headers->get('Authorization');
         $parts = explode(':', $auth, 2);
         if (2 !== count($parts)) {
-            throw new CustomUserMessageAuthenticationException('Invalid authorization explode');
+            throw new CustomUserMessageAuthenticationException('Invalid token format');
         }
 
         $userIdentifier = $parts[0];

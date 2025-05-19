@@ -34,12 +34,31 @@ class ArchiveApiTest extends AbstractZippyTestCase
         $id = $json['id'];
         $this->assertMatchesRegularExpression('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
         $this->assertEquals($identifier, $json['identifier']);
-        $this->assertEquals('created', $json['status']);
+        $this->assertEquals('ready', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
         $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
 
         $archive = $this->getArchiveFromDatabase($id);
         $this->expectedFiles($files, $archive);
+
+        $archivePath = $this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip';
+        $this->assertTrue(file_exists($archivePath));
+
+        $response = $this->request('GET', $json['downloadUrl']);
+        $html = $response->getContent();
+        if (1 !== preg_match('#document\.location = \'([^\']+)\'#', $html, $matches)) {
+            throw new \Exception('Cannot find redirect location in HTML');
+        }
+        $downloadUrl = $matches[1];
+
+        ob_start();
+        ob_start();
+        $response = $this->request('GET', $downloadUrl);
+        ob_end_clean();
+        ob_end_clean();
+        $this->assertEquals('attachment; filename="foo.zip"', $response->getHeaders()['content-disposition'][0]);
+
+        $this->removeArchive($id);
     }
 
     public function testPutArchiveReturnsMethodNotAllowed(): void
