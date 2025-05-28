@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Identifier;
 
-use App\Archive\IdentifierGenerator;
 use PHPUnit\Framework\TestCase;
+use App\Archive\IdentifierGenerator;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class IdentifierGeneratorTest extends TestCase
 {
-    /**
-     * @dataProvider getSameCases
-     */
+    #[DataProvider('getSameCases')]
     public function testGeneratorWillReturnSameIdentifier(array $files1, array $files2): void
     {
         $generator = new IdentifierGenerator();
@@ -23,9 +22,7 @@ class IdentifierGeneratorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getDifferentCases
-     */
+    #[DataProvider('getDifferentCases')]
     public function testGeneratorWillReturnDifferentIdentifier(array $files1, array $files2): void
     {
         $generator = new IdentifierGenerator();
@@ -37,7 +34,7 @@ class IdentifierGeneratorTest extends TestCase
         );
     }
 
-    public function getSameCases(): array
+    public static function getSameCases(): array
     {
         return [
             // Exactly same
@@ -112,7 +109,7 @@ class IdentifierGeneratorTest extends TestCase
         ];
     }
 
-    public function getDifferentCases(): array
+    public static function getDifferentCases(): array
     {
         return [
             [
