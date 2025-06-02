@@ -26,6 +26,8 @@ services:
     _instanceof:
         Doctrine\Common\EventSubscriber:
             tags: ['doctrine.event_subscriber']
+        Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessageHandlerInterface:
+            tags: ['arthem_rabbit.event_handler']
         Symfony\Component\EventDispatcher\EventSubscriberInterface:
             tags: ['kernel.event_subscriber']
         App\Download\DownloadAdapterInterface:
@@ -53,7 +55,7 @@ services:
 
     GuzzleHttp\ClientInterface: '@GuzzleHttp\Client'
 
-    App\Api\Processor\ArchiveProcessor:
+    App\Api\DataTransformer\ArchiveInputDataTransformer:
         arguments:
             $maxExpirationTime: '%env(int:MAX_EXPIRATION_TIME)%'
 

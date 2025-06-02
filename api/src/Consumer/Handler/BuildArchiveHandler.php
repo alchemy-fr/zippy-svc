@@ -4,34 +4,38 @@ declare(strict_types=1);
 
 namespace App\Consumer\Handler;
 
-use Throwable;
-use App\Entity\Archive;
-use Doctrine\DBAL\LockMode;
 use App\Archive\ArchiveManager;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Entity\Archive;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\AbstractEntityManagerHandler;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
+use Arthem\Bundle\RabbitBundle\Consumer\Exception\ObjectNotFoundForHandlerException;
+use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManager;
+use Throwable;
 
-#[AsMessageHandler]
-class BuildArchiveHandler
+class BuildArchiveHandler extends AbstractEntityManagerHandler
 {
-    private ArchiveManager $archiveManager;
-    private EntityManagerInterface $em;
+    const EVENT = 'build_archive';
 
-    public function __construct(ArchiveManager $archiveManager, EntityManagerInterface $em)
+    private ArchiveManager $archiveManager;
+
+    public function __construct(ArchiveManager $archiveManager)
     {
         $this->archiveManager = $archiveManager;
-        $this->em = $em;
     }
 
-    public function __invoke(BuildArchive $message): void
+    public function handle(EventMessage $message): void
     {
-        $id = $message->getId();
+        $payload = $message->getPayload();
+        $id = $payload['id'];
 
-        $archive = $this->em->transactional(function () use ($id): ?Archive {
-            $archive = $this->em->find(Archive::class, $id, LockMode::PESSIMISTIC_WRITE);
+        /** @var EntityManager $em */
+        $em = $this->getEntityManager();
+
+        $archive = $em->transactional(function () use ($em, $id): ?Archive {
+            $archive = $em->find(Archive::class, $id, LockMode::PESSIMISTIC_WRITE);
             if (!$archive instanceof Archive) {
-                throw new NotFoundHttpException("Archive not found");
+                throw new ObjectNotFoundForHandlerException(Archive::class, $id, __CLASS__);
             }
 
             if (Archive::STATUS_IN_PROGRESS === $archive->getStatus()) {
@@ -39,8 +43,8 @@ class BuildArchiveHandler
             }
 
             $archive->setStatus(Archive::STATUS_IN_PROGRESS);
-            $this->em->persist($archive);
-            $this->em->flush();
+            $em->persist($archive);
+            $em->flush();
 
             return $archive;
         });
@@ -53,14 +57,19 @@ class BuildArchiveHandler
             $this->archiveManager->buildArchive($archive);
         } catch (Throwable $e) {
             $archive->setStatus(Archive::STATUS_ERROR);
-            $this->em->persist($archive);
-            $this->em->flush();
+            $em->persist($archive);
+            $em->flush();
 
             throw $e;
         }
 
         $archive->setStatus(Archive::STATUS_READY);
-        $this->em->persist($archive);
-        $this->em->flush();
+        $em->persist($archive);
+        $em->flush();
+    }
+
+    public static function getHandledEvents(): array
+    {
+        return [self::EVENT];
     }
 }

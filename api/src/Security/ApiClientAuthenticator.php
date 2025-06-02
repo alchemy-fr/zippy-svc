@@ -4,49 +4,42 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
-class ApiClientAuthenticator extends AbstractAuthenticator
+class ApiClientAuthenticator extends AbstractGuardAuthenticator
 {
-    public function __construct(
-        private readonly UserProviderInterface $userProvider,
-    ) {
-    }
-    
-    public function supports(Request $request): bool
+    public function supports(Request $request)
     {
         return $request->headers->has('Authorization');
     }
 
-    public function authenticate(Request $request): Passport
+    public function getCredentials(Request $request)
     {
         $auth = $request->headers->get('Authorization');
         $parts = explode(':', $auth, 2);
         if (2 !== count($parts)) {
-            throw new CustomUserMessageAuthenticationException('Invalid token format');
+            return null;
         }
 
-        $userIdentifier = $parts[0];
+        return $parts;
+    }
 
-        try {
-            $this->userProvider->loadUserByIdentifier($userIdentifier);
-        } catch (UserNotFoundException) {
-            throw new CustomUserMessageAuthenticationException('Invalid authorization no user');
+    public function getUser($credentials, UserProviderInterface $userProvider)
+    {
+        if (null === $credentials) {
+            return null;
         }
 
-        return new SelfValidatingPassport(new UserBadge($userIdentifier));       
+        [$username] = $credentials;
+
+        return $userProvider->loadUserByUsername($username);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
@@ -54,7 +47,7 @@ class ApiClientAuthenticator extends AbstractAuthenticator
         return $user->getPassword() === $credentials[1];
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         $data = [
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData()),
@@ -63,8 +56,25 @@ class ApiClientAuthenticator extends AbstractAuthenticator
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
     {
         return null;
+    }
+
+    /**
+     * Called when authentication is needed, but it's not sent.
+     */
+    public function start(Request $request, AuthenticationException $authException = null)
+    {
+        $data = [
+            'message' => 'Authentication Required',
+        ];
+
+        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function supportsRememberMe()
+    {
+        return false;
     }
 }

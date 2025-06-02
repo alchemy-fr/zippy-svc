@@ -14,28 +14,34 @@ class ArchiveOutput
     use CreatedAtDTOTrait;
     use UpdatedAtDTOTrait;
 
-
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private string $id;
 
-
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private string $identifier;
 
-
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private array $archives = [];
 
- 
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private string $status;
 
-
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private ?string $downloadUrl = null;
 
-
-    #[Groups(["archive:read"])]
+    /**
+     * @Groups({"archive:read"})
+     */
     private ?DateTime $expiresAt = null;
 
     public function getId(): string
