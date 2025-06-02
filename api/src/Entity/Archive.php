@@ -4,49 +4,38 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use DateTime;
-use Ramsey\Uuid\Uuid;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Api\ArchiveInput;
 use App\Api\ArchiveOutput;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
-use Ramsey\Uuid\UuidInterface;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
-use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Doctrine\UuidType;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use App\Api\Processor\ArchiveProcessor;
-use App\Repository\ArchiveRepository;
-use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\Common\Collections\Collection;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
-#[ApiResource(
-   shortName: "archive",
-   security: "is_granted('ROLE_API')",
-   normalizationContext: [
-    "groups" => ["_", "archive:read"],
-    "skip_null_values" => false,
-   ],
-   denormalizationContext: ["groups"=> ["archive:write"]],
-   operations: [
-       new Post(
-           input: ArchiveInput::class,
-           processor: ArchiveProcessor::class
-       ),
-       new Get(),
-       new Patch(
-            input: ArchiveInput::class,
-            processor: ArchiveProcessor::class
-       ),
-       new Delete(),
-   ],
-   output: ArchiveOutput::class
-  )]
-#[ORM\Entity(repositoryClass: ArchiveRepository::class)]
-#[ORM\Table]
+/**
+ * @ApiResource(
+ *  shortName="archive",
+ *  attributes={"security"="is_granted('ROLE_API')"},
+ *  normalizationContext={
+ *     "groups"={"_", "archive:read"},
+ *    "skip_null_values" = false,
+ *  },
+ *  denormalizationContext={"groups"={"archive:write"}},
+ *  input=ArchiveInput::class,
+ *  output=ArchiveOutput::class,
+ *  itemOperations={
+ *    "get",
+ *    "patch",
+ *    "delete",
+ *  }
+ * )
+ * @ORM\Entity(repositoryClass="App\Repository\ArchiveRepository")
+ */
 class Archive
 {
     public const STATUS_CREATED = 0;
@@ -62,44 +51,57 @@ class Archive
         self::STATUS_UPDATING => 'updating',
         self::STATUS_ERROR => 'error',
     ];
-   
-    #[ApiProperty(identifier: true)]
-    #[ORM\Id]
-    #[ORM\Column(type: UuidType::NAME, unique: true)]
+
+    /**
+     * @ApiProperty(identifier=true)
+     * @ORM\Id
+     * @ORM\Column(type="uuid", unique=true)
+     */
     private UuidInterface $id;
 
-
-    #[ORM\Column(type: "string", length: 128, nullable: false)]
+    /**
+     * @ORM\Column(type="string", length=128, nullable=false)
+     */
     private ?string $client = null;
 
-
-    #[ORM\Column(type: "datetime")]
-    #[Gedmo\Timestampable(on: "create")]
+    /**
+     * @ORM\Column(type="datetime")
+     * @Gedmo\Timestampable(on="create")
+     */
     private ?DateTime $createdAt = null;
 
-    #[ORM\Column(type: "datetime")]
-    #[Gedmo\Timestampable(on: "update")]
+    /**
+     * @ORM\Column(type="datetime")
+     * @Gedmo\Timestampable(on="update")
+     */
     private ?DateTime $updatedAt = null;
 
-    #[ORM\Column(type: "datetime", nullable: true)]
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
     private ?DateTime $expiresAt = null;
 
-
-    #[ORM\Column(type: "string", length: 128, nullable: false, unique: true)]
+    /**
+     * @ORM\Column(type="string", length=128, nullable=false, unique=true)
+     */
     private ?string $identifier = null;
 
     /**
      * @var Collection|File[]|null
+     *
+     * @ApiSubresource()
+     * @ORM\OneToMany(targetEntity="File", mappedBy="archive", cascade={"persist", "remove"})
      */
-    #[ORM\OneToMany(targetEntity: "File", mappedBy: "archive", cascade: ["persist", "remove"])]
     private ?Collection $files = null;
 
-
-    #[ORM\Column(type: "smallint", nullable: false)]
+    /**
+     * @ORM\Column(type="smallint", nullable=false)
+     */
     private int $status = self::STATUS_CREATED;
 
-
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private ?string $downloadFilename = null;
 
     public function __construct()

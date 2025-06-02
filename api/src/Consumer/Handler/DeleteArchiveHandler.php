@@ -4,30 +4,39 @@ declare(strict_types=1);
 
 namespace App\Consumer\Handler;
 
-use App\Entity\Archive;
 use App\Archive\ArchiveManager;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Entity\Archive;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\AbstractEntityManagerHandler;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
+use Arthem\Bundle\RabbitBundle\Consumer\Exception\ObjectNotFoundForHandlerException;
 
-#[AsMessageHandler]
-class DeleteArchiveHandler
+class DeleteArchiveHandler extends AbstractEntityManagerHandler
 {
-    public function __construct(private ArchiveManager $archiveManager,
-        private EntityManagerInterface $em)
+    const EVENT = 'delete_archive';
+
+    private ArchiveManager $archiveManager;
+
+    public function __construct(ArchiveManager $archiveManager)
     {
+        $this->archiveManager = $archiveManager;
     }
 
-    public function __invoke(DeleteArchive $message): void
+    public function handle(EventMessage $message): void
     {
         $payload = $message->getPayload();
         $id = $payload['id'];
 
-        $archive = $this->em->find(Archive::class, $id);
+        $em = $this->getEntityManager();
+        $archive = $em->find(Archive::class, $id);
         if (!$archive instanceof Archive) {
-            throw new NotFoundHttpException("Archive not found");
+            throw new ObjectNotFoundForHandlerException(Archive::class, $id, __CLASS__);
         }
 
         $this->archiveManager->deleteArchive($archive);
+    }
+
+    public static function getHandledEvents(): array
+    {
+        return [self::EVENT];
     }
 }

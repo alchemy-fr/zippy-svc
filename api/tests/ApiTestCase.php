@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
-use ApiPlatform\Symfony\Bundle\Test\Client;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Contracts\HttpClient\ResponseInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase as TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\HttpFoundation\Response;
 
-abstract class ApiTestCase extends TestCase
+abstract class ApiTestCase extends WebTestCase
 {
-
-    protected ?Client $client;
+    protected ?AbstractBrowser $client = null;
 
     protected function request(
         string $method,
@@ -22,19 +20,21 @@ abstract class ApiTestCase extends TestCase
         array $files = [],
         array $server = [],
         ?string $content = null
-    ): ResponseInterface {
-        
+    ): Response {
+        $server['CONTENT_TYPE'] = $server['CONTENT_TYPE'] ?? 'application/json';
+        $server['HTTP_ACCEPT'] = $server['HTTP_ACCEPT'] ?? 'application/json';
+        $server['HTTP_AUTHORIZATION'] = 'client:secret';
+
         if (empty($content) && !empty($params) && in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'], true)) {
             $content = json_encode($params);
         }
 
-        $headers['Authorization'] = 'client:secret';
-        $headers['Content-Type'] = $server['CONTENT_TYPE'] ?? 'application/json';
+        $this->client->request($method, $uri, $params, $files, $server, $content);
 
-        return $this->client->request($method, $uri, [
-            'headers' => $headers, 
-            'json' => $params
-        ]);
+        /** @var Response $response */
+        $response = $this->client->getResponse();
+
+        return $response;
     }
 
     protected function setUp(): void
@@ -58,7 +58,7 @@ abstract class ApiTestCase extends TestCase
 
     protected static function getEntityManager(): EntityManagerInterface
     {
-        return self::getContainer()->get(EntityManagerInterface::class);
+        return self::$container->get(EntityManagerInterface::class);
     }
 
     protected function clearEmBeforeApiCall(): void

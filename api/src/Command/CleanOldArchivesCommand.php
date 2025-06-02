@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Consumer\Handler\CleanOldArchives;
+use App\Consumer\Handler\CleanOldArchivesHandler;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
+use Arthem\Bundle\RabbitBundle\Producer\EventProducer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanOldArchivesCommand extends Command
@@ -16,12 +17,12 @@ class CleanOldArchivesCommand extends Command
 
     const COMMAND_NAME = 'app:archives:clean-old';
 
-    private MessageBusInterface $bus;
+    private EventProducer $eventProducer;
 
-    public function __construct(MessageBusInterface $bus, string $name = null)
+    public function __construct(EventProducer $eventProducer, string $name = null)
     {
         parent::__construct($name);
-        $this->bus = $bus;
+        $this->eventProducer = $eventProducer;
     }
 
     protected function configure()
@@ -31,7 +32,7 @@ class CleanOldArchivesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->bus->dispatch(new CleanOldArchives());
+        $this->eventProducer->publish(new EventMessage(CleanOldArchivesHandler::EVENT, []));
 
         $output->writeln('Clean triggered!');
 

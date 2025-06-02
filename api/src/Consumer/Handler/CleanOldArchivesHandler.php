@@ -4,26 +4,43 @@ declare(strict_types=1);
 
 namespace App\Consumer\Handler;
 
+use App\Archive\ArchiveManager;
 use App\Entity\Archive;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\AbstractEntityManagerHandler;
+use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
+use Arthem\Bundle\RabbitBundle\Consumer\Exception\ObjectNotFoundForHandlerException;
+use Arthem\Bundle\RabbitBundle\Producer\EventProducer;
+use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManager;
+use Throwable;
 
-#[AsMessageHandler]
-class CleanOldArchivesHandler
+class CleanOldArchivesHandler extends AbstractEntityManagerHandler
 {
-    public function __construct(private MessageBusInterface $bus, 
-        private EntityManagerInterface $em)
-    {
+    const EVENT = 'clean_archives';
 
+    private EventProducer $eventProducer;
+
+    public function __construct(EventProducer $eventProducer)
+    {
+        $this->eventProducer = $eventProducer;
     }
 
-    public function __invoke(CleanOldArchives $message): void
+    public function handle(EventMessage $message): void
     {
-        $archives = $this->em->getRepository(Archive::class)->getExpired();
+        /** @var EntityManager $em */
+        $em = $this->getEntityManager();
+
+        $archives = $em->getRepository(Archive::class)->getExpired();
 
         foreach ($archives as $archive) {
-            $this->bus->dispatch(new DeleteArchive($archive->getId()));
+            $this->eventProducer->publish(new EventMessage(DeleteArchiveHandler::EVENT, [
+                'id' => $archive->getId(),
+            ]));
         }
+    }
+
+    public static function getHandledEvents(): array
+    {
+        return [self::EVENT];
     }
 }
