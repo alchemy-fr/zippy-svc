@@ -2,41 +2,55 @@
 
 declare(strict_types=1);
 
-namespace App\Api\DataTransformer;
+namespace App\Api\Processor;
 
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Validator\ValidatorInterface;
-use App\Api\ArchiveInput;
-use App\Archive\IdentifierGenerator;
-use App\Entity\Archive;
 use DateTime;
+use App\Entity\Archive;
+use ApiPlatform\Metadata\Operation;
+use App\Archive\IdentifierGenerator;
+use App\Consumer\Handler\BuildArchive;
+use Doctrine\ORM\EntityManagerInterface;
+use ApiPlatform\State\ProcessorInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use ApiPlatform\Validator\ValidatorInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ArchiveInputDataTransformer implements DataTransformerInterface
+class ArchiveProcessor implements ProcessorInterface
 {
     private ValidatorInterface $validator;
     private IdentifierGenerator $identifierGenerator;
     private ?int $maxExpirationTime;
+    private Security $security;
+    private MessageBusInterface $bus;
+    private EntityManagerInterface $em;
 
     public function __construct(
+        EntityManagerInterface $em,
         ValidatorInterface $validator,
         IdentifierGenerator $identifierGenerator,
+        Security $security,
+        MessageBusInterface $bus,
         ?int $maxExpirationTime
     )
     {
         $this->validator = $validator;
         $this->identifierGenerator = $identifierGenerator;
         $this->maxExpirationTime = $maxExpirationTime;
+        $this->security = $security;
+        $this->bus = $bus;
+        $this->em = $em;
     }
 
-    /**
-     * @param ArchiveInput $data
-     */
-    public function transform($data, string $to, array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Archive
     {
-        $isNew = !isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]);
 
+        $isNew = false;
+        if ($operation instanceof \ApiPlatform\Metadata\Post) {
+            $isNew = true;
+        }
+       
         $this->validator->validate($data, [
             'groups' => [
                 'Default',
@@ -44,7 +58,14 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             ],
         ]);
 
-        $object = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new Archive();
+        if ($isNew) {
+            $object = new Archive();
+        } else {
+            $object = $this->em->find(Archive::class, $uriVariables['id']);
+            if (null === $object) {
+                throw new NotFoundHttpException('Archive not found');
+            }
+        }
 
         if (null !== $data->getDownloadFilename()) {
             $object->setDownloadFilename($data->getDownloadFilename());
@@ -82,15 +103,13 @@ class ArchiveInputDataTransformer implements DataTransformerInterface
             $object->setExpiresAt($expiresAt);
         }
 
+        $object->setClient($this->security->getUser()->getUserIdentifier());
+
+        $this->em->persist($object);
+        $this->em->flush();
+        
+        $this->bus->dispatch(new BuildArchive($object->getId()));
+        
         return $object;
-    }
-
-    public function supportsTransformation($data, string $to, array $context = []): bool
-    {
-        if ($data instanceof Archive) {
-            return false;
-        }
-
-        return Archive::class === $to && ArchiveInput::class === ($context['input']['class'] ?? null);
     }
 }

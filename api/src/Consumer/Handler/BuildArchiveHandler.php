@@ -4,38 +4,34 @@ declare(strict_types=1);
 
 namespace App\Consumer\Handler;
 
-use App\Archive\ArchiveManager;
-use App\Entity\Archive;
-use Arthem\Bundle\RabbitBundle\Consumer\Event\AbstractEntityManagerHandler;
-use Arthem\Bundle\RabbitBundle\Consumer\Event\EventMessage;
-use Arthem\Bundle\RabbitBundle\Consumer\Exception\ObjectNotFoundForHandlerException;
-use Doctrine\DBAL\LockMode;
-use Doctrine\ORM\EntityManager;
 use Throwable;
+use App\Entity\Archive;
+use Doctrine\DBAL\LockMode;
+use App\Archive\ArchiveManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class BuildArchiveHandler extends AbstractEntityManagerHandler
+#[AsMessageHandler]
+class BuildArchiveHandler
 {
-    const EVENT = 'build_archive';
-
     private ArchiveManager $archiveManager;
+    private EntityManagerInterface $em;
 
-    public function __construct(ArchiveManager $archiveManager)
+    public function __construct(ArchiveManager $archiveManager, EntityManagerInterface $em)
     {
         $this->archiveManager = $archiveManager;
+        $this->em = $em;
     }
 
-    public function handle(EventMessage $message): void
+    public function __invoke(BuildArchive $message): void
     {
-        $payload = $message->getPayload();
-        $id = $payload['id'];
+        $id = $message->getId();
 
-        /** @var EntityManager $em */
-        $em = $this->getEntityManager();
-
-        $archive = $em->transactional(function () use ($em, $id): ?Archive {
-            $archive = $em->find(Archive::class, $id, LockMode::PESSIMISTIC_WRITE);
+        $archive = $this->em->transactional(function () use ($id): ?Archive {
+            $archive = $this->em->find(Archive::class, $id, LockMode::PESSIMISTIC_WRITE);
             if (!$archive instanceof Archive) {
-                throw new ObjectNotFoundForHandlerException(Archive::class, $id, __CLASS__);
+                throw new NotFoundHttpException("Archive not found");
             }
 
             if (Archive::STATUS_IN_PROGRESS === $archive->getStatus()) {
@@ -43,8 +39,8 @@ class BuildArchiveHandler extends AbstractEntityManagerHandler
             }
 
             $archive->setStatus(Archive::STATUS_IN_PROGRESS);
-            $em->persist($archive);
-            $em->flush();
+            $this->em->persist($archive);
+            $this->em->flush();
 
             return $archive;
         });
@@ -57,19 +53,14 @@ class BuildArchiveHandler extends AbstractEntityManagerHandler
             $this->archiveManager->buildArchive($archive);
         } catch (Throwable $e) {
             $archive->setStatus(Archive::STATUS_ERROR);
-            $em->persist($archive);
-            $em->flush();
+            $this->em->persist($archive);
+            $this->em->flush();
 
             throw $e;
         }
 
         $archive->setStatus(Archive::STATUS_READY);
-        $em->persist($archive);
-        $em->flush();
-    }
-
-    public static function getHandledEvents(): array
-    {
-        return [self::EVENT];
+        $this->em->persist($archive);
+        $this->em->flush();
     }
 }

@@ -45,12 +45,12 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $filePrefix = $this->getTestDataSetDir();
         $files = [
             [
-                'uri' => $filePrefix.'/three.jpg',
-                'path' => 'one/two/three.jpg',
+                'uri' => $filePrefix.'/five.jpg',
+                'path' => 'one/two/five.jpg',
             ],
             [
-                'uri' => $filePrefix.'/four.txt',
-                'path' => 'four.txt',
+                'uri' => $filePrefix.'/six.txt',
+                'path' => 'six.txt',
             ],
         ];
         $this->doTestPostArchiveOK($files, ['expiresIn' => 300]);
@@ -61,10 +61,12 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $data = [
             'files' => $files,
         ];
-        if ($options['identifier'] ?? false) {
+
+        if (isset($options['identifier'])) {
             $data['identifier'] = $options['identifier'];
         }
-        if ($options['expiresIn'] ?? false) {
+
+        if (isset($options['expiresIn'])) {
             $data['expiresIn'] = $options['expiresIn'];
         }
         $now = time();
@@ -73,11 +75,11 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         $json = json_decode($response->getContent(), true);
 
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals('application/json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
 
         $this->assertArrayHasKey('id', $json);
         $id = $json['id'];
-        $this->assertRegExp('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
+        $this->assertMatchesRegularExpression('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
         if ($options['identifier'] ?? false) {
             $this->assertEquals($options['identifier'], $json['identifier']);
         }
@@ -89,12 +91,12 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         } else {
             $this->assertNull($json['expiresAt']);
         }
-        $this->assertEquals('created', $json['status']);
+        $this->assertEquals('ready', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
         $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
-
+    
         $archive = $this->getArchiveFromDatabase($id);
-        $this->expectedFiles($files, $archive);
+        $this->expectedFiles($files, $archive);  
 
         $archivePath = $this->getArchiveDir().DIRECTORY_SEPARATOR.$id.'.zip';
         $this->assertTrue(file_exists($archivePath));
@@ -115,13 +117,14 @@ class PostArchiveApiTest extends AbstractZippyTestCase
                 'path' => 'four.txt',
             ],
         ];
+
         $response = $this->request('POST', '/archives', [
             'identifier' => '',
             'files' => $files,
         ]);
-
+        
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('application/problem+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders(false)['content-type'][0]);
     }
 
     public function testPostArchiveWithEmptyFilesReturns422(): void
@@ -131,6 +134,6 @@ class PostArchiveApiTest extends AbstractZippyTestCase
         ]);
 
         $this->assertEquals(422, $response->getStatusCode());
-        $this->assertEquals('application/problem+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders(false)['content-type'][0]);
     }
 }
