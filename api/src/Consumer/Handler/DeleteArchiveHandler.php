@@ -20,8 +20,7 @@ class DeleteArchiveHandler
 
     public function __invoke(DeleteArchive $message): void
     {
-        $payload = $message->getPayload();
-        $id = $payload['id'];
+        $id = $message->getId();
 
         $archive = $this->em->find(Archive::class, $id);
         if (!$archive instanceof Archive) {
