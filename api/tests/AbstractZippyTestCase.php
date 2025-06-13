@@ -16,7 +16,7 @@ abstract class AbstractZippyTestCase extends ApiTestCase
 
     protected function getArchiveDir(): string
     {
-        return self::$container->getParameter('app.archive_dir');
+        return self::getContainer()->getParameter('app.archive_dir');
     }
 
     protected function removeArchive(string $id): void
@@ -45,7 +45,7 @@ abstract class AbstractZippyTestCase extends ApiTestCase
                 'uri' => $f->getUri(),
                 'path' => $f->getPath(),
             ];
-        }, $archive->getFiles()->getValues()));
+        }, $archive->getFiles()->toArray()));
     }
 
     protected function createArchive(array $options = []): Archive

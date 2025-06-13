@@ -10,7 +10,13 @@ doctrine:
         mappings:
             App:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            driver: 'sqlite'
+            url: '%env(resolve:DATABASE_URL)%'      

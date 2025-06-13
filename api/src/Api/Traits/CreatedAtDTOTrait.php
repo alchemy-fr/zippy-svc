@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Api\Traits;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
 use DateTime;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 trait CreatedAtDTOTrait
 {
-    /**
-     * @ApiProperty()
-     * @Groups({"_"})
-     */
+     #[ApiProperty()]
+     #[Groups(["_"])]
     protected DateTime $createdAt;
 
     public function getCreatedAt(): DateTime

@@ -27,15 +27,14 @@ class ArchiveApiTest extends AbstractZippyTestCase
         ]);
 
         $json = json_decode($response->getContent(), true);
-
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals('application/json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
 
         $this->assertArrayHasKey('id', $json);
         $id = $json['id'];
-        $this->assertRegExp('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
+        $this->assertMatchesRegularExpression('#^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$#', $id);
         $this->assertEquals($identifier, $json['identifier']);
-        $this->assertEquals('created', $json['status']);
+        $this->assertEquals('ready', $json['status']);
         $this->assertArrayHasKey('downloadUrl', $json);
         $this->assertMatchesRegularExpression(sprintf('#^http://localhost/archives/%s/download\?jwt=.+$#', $id), $json['downloadUrl']);
 
@@ -57,7 +56,7 @@ class ArchiveApiTest extends AbstractZippyTestCase
         $response = $this->request('GET', $downloadUrl);
         ob_end_clean();
         ob_end_clean();
-        $this->assertEquals('attachment; filename="foo.zip"', $response->headers->get('Content-Disposition'));
+        $this->assertEquals('attachment; filename="foo.zip"', $response->getHeaders()['content-disposition'][0]);
 
         $this->removeArchive($id);
     }
@@ -66,11 +65,13 @@ class ArchiveApiTest extends AbstractZippyTestCase
     {
         $archive = $this->createArchive();
 
-        $response = $this->request('PUT', '/archives/'.$archive->getId(), [
-            'files' => [
-                'uri' => 'https://some-url.com/some/path',
-                'path' => 'one/five.jpg',
-            ],
+        $response = static::createClient()->request('PUT', '/archives/'.$archive->getId(), [
+            'json' => [
+                'files' => [
+                    'uri' => 'https://some-url.com/some/path',
+                    'path' => 'one/five.jpg',
+                ],
+            ]           
         ]);
 
         $this->assertEquals(405, $response->getStatusCode());
@@ -88,10 +89,14 @@ class ArchiveApiTest extends AbstractZippyTestCase
             ],
         ];
 
-        $response = $this->request('PATCH', '/archives/'.$archive->getId(), [
-            'files' => $files,
-        ], [], [
-            'CONTENT_TYPE' => 'application/merge-patch+json',
+        $response = static::createClient()->request('PATCH', '/archives/'.$archive->getId(), [
+            'headers' => [
+                'Content-Type' => 'application/merge-patch+json',
+                'Authorization' => 'client:secret'
+            ],
+            'json' => [
+                'files' => $files,
+            ]
         ]);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -104,7 +109,11 @@ class ArchiveApiTest extends AbstractZippyTestCase
     {
         $archive = $this->createArchive();
 
-        $response = $this->request('DELETE', '/archives/'.$archive->getId());
+        $response = static::createClient()->request('DELETE', '/archives/'.$archive->getId(), [
+            'headers' => [
+                'Authorization' => 'client:secret'
+            ]
+        ]);
 
         $this->clearEmBeforeApiCall();
         $this->assertEquals(204, $response->getStatusCode());

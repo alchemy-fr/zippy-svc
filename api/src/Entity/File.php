@@ -4,49 +4,42 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\Doctrine\UuidType;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *  shortName="file",
- *  collectionOperations={},
- *  itemOperations={},
- * )
- * @ORM\Entity
- */
+#[ApiResource(
+    shortName: 'file',
+)]
+#[ORM\Entity]
 class File
 {
-    /**
-     * @ApiProperty(identifier=true)
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     */
+    
+    #[ApiProperty(identifier: true)]
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
     private UuidInterface $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Archive", inversedBy="files")
-     */
+
+    #[ORM\ManyToOne(targetEntity: "Archive", inversedBy: "files")]
     private Archive $archive;
 
     /**
      * The remote file URL.
-     *
-     * @Groups({"file:read", "file:write", "archive:write"})
-     * @ORM\Column(type="string", length=1024)
      */
+    #[Groups(["file:read", "file:write", "archive:write"])]
+    #[ORM\Column(type: "string", length: 1024)] 
     private ?string $uri = null;
 
     /**
      * The path in the archive.
-     *
-     * @Groups({"file:read", "file:write", "archive:write"})
-     * @ORM\Column(type="string", length=1024)
      */
+    #[Groups(["file:read", "file:write", "archive:write"])]
+    #[ORM\Column(type: "string", length: 1024)]
     private ?string $path = null;
 
     public function __construct()
