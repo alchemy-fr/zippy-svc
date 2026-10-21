@@ -1,4 +1,4 @@
-FROM php:8.3.20-fpm-alpine3.20 AS zippy-api
+FROM php:8.5.11-fpm-alpine3.23 AS zippy-api
 
 RUN apk add --no-cache --virtual .persistent-deps \
 		git \
@@ -9,9 +9,9 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		libzip \
         rabbitmq-c-dev
 
-ENV APCU_VERSION=5.1.24 \
-    XDEBUG_VERSION=3.4 \
-    AMQP_VERSION=1.11.0 \
+ENV APCU_VERSION=5.1.28 \
+    XDEBUG_VERSION=3.5.0 \
+    AMQP_VERSION=2.2.0 \
     APP_ENV=prod
 
 RUN set -eux \
@@ -33,15 +33,14 @@ RUN set -eux \
         amqp-${AMQP_VERSION} \
 		xdebug-${XDEBUG_VERSION} \
 	&& docker-php-ext-enable --ini-name 20-apcu.ini apcu \
-	&& docker-php-ext-enable --ini-name 05-opcache.ini opcache \
     && docker-php-ext-enable amqp \
 	&& apk del .build-deps
 
 # ------------------------ add nginx ------------------------
 # Taken from official nginx container Dockerfile
 
-ENV NGINX_VERSION 1.28.0
-ENV NJS_VERSION   0.8.10
+ENV NGINX_VERSION 1.30.6
+ENV NJS_VERSION   1.0.2
 ENV PKG_RELEASE   1
 
 RUN set -x \
@@ -135,6 +134,9 @@ RUN set -x \
 COPY --from=composer:2.2.25 /usr/bin/composer /usr/bin/composer
 
 RUN ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini \
+    # The session upload progress handler is exploitable before any authentication
+    # (CVE-2026-109618, CVE-2026-109619) and the API does not rely on it.
+    && printf "session.upload_progress.enabled = Off\n" > $PHP_INI_DIR/conf.d/zz-session-upload-progress.ini \
     # Increase process-timeout for "composer test" which downloads phpunit
     && composer config --global process-timeout 2000 \
     && adduser -D -u 1000 app \
