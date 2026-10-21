@@ -1,4 +1,4 @@
-FROM php:8.5.11-fpm-alpine3.23 AS zippy-api
+FROM php:8.5.12-fpm-alpine3.23 AS zippy-api
 
 RUN apk add --no-cache --virtual .persistent-deps \
 		git \
